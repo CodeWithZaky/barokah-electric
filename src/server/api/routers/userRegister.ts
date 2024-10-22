@@ -4,8 +4,8 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
-export const userRegister = createTRPCRouter({
-  register: publicProcedure
+export const userRegisterRoute = createTRPCRouter({
+  userRegister: publicProcedure
     .input(
       z.object({
         email: z.string().email(),
