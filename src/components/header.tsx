@@ -8,11 +8,12 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = () => {
   const session = useSession();
+
   return (
     <div className="mb-7 mt-5 flex w-full flex-col items-center">
       <div className="flex w-full items-center justify-between p-4">
         <div>
-          <Link href="/">JAVA9CELL</Link>
+          <Link href="/">BarokahElektrik</Link>
         </div>
         <Search />
         <div className="flex items-center justify-end gap-7">
