@@ -8,6 +8,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = () => {
   const session = useSession();
+  console.log(session);
 
   return (
     <div className="mb-7 mt-5 flex w-full flex-col items-center">
@@ -17,21 +18,25 @@ const Header = () => {
         </div>
         <Search />
         <div className="flex items-center justify-end gap-7">
-          <div className="relative">
-            <LuShoppingCart className="text-3xl" />
-            <p className="absolute -right-3 -top-2 rounded-full border-2 border-background bg-foreground px-1 text-sm text-background">
-              99
-            </p>
-          </div>
+          <Link href={"/cart"}>
+            <div className="relative">
+              <LuShoppingCart className="text-3xl" />
+              <p className="absolute -right-3 -top-2 rounded-full border-2 border-background bg-foreground px-1 text-sm text-background">
+                99
+              </p>
+            </div>
+          </Link>
           {session.status === "unauthenticated" ? (
+            <div className="flex space-x-3">
+              <Button onClick={() => signIn()}>Login</Button>
+              <Link href="/register">
+                <Button variant={"outline"}>Register</Button>
+              </Link>
+            </div>
+          ) : (
             <div className="flex gap-3">
               <Avatar image="https://github.com/shadcn.png" alt="cn" />
               <Button onClick={() => signOut()}>Logout</Button>
-            </div>
-          ) : (
-            <div className="space-x-3">
-              <Button onClick={() => signIn()}>Login</Button>
-              <Button variant={"outline"}>Register</Button>
             </div>
           )}
         </div>

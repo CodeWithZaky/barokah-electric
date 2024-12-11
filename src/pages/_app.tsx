@@ -5,7 +5,6 @@ import { type AppType } from "next/app";
 
 import { api } from "@/utils/api";
 
-import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 import clsx from "clsx";
@@ -31,8 +30,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
               "min-h-screen w-full bg-muted-foreground/50",
             )}
           >
-            <div className="mx-auto flex w-[70%] flex-col bg-background px-7">
-              <Header />
+            <div className="flexE w-ful mx-auto flex-col bg-background px-7">
               <Component {...pageProps} />
             </div>
           </main>

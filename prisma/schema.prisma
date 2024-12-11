@@ -64,18 +64,19 @@ model VerificationToken {
 }
 
 model Product {
-    id          Int            @id @default(autoincrement())
-    createdAt   DateTime       @default(now())
-    updatedAt   DateTime       @updatedAt
-    name        String         @db.VarChar(255)
-    description String
-    price       Float
-    rate        Float
-    published   Boolean        @default(false)
-    images      ProductImage[] // One-to-many relationship with ProductImage
-    userId      String
-    user        User           @relation(fields: [userId], references: [id]) // Many-to-one relationship with User
-    cartItems   CartItem[] // One-to-many relationship with CartItem
+    id            Int            @id @default(autoincrement())
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    name          String         @db.VarChar(255)
+    description   String
+    price         Float
+    rate          Float
+    published     Boolean        @default(false)
+    images        ProductImage[] // One-to-many relationship with ProductImage
+    userId        String
+    user          User           @relation(fields: [userId], references: [id]) // Many-to-one relationship with User
+    cartItems     CartItem[] // One-to-many relationship with CartItem
+    Order_product OrderProduct[]
 }
 
 model ProductImage {
@@ -104,4 +105,39 @@ model CartItem {
     cartId    Int
     product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // Many-to-one relationship with Product
     cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade) // Many-to-one relationship with Cart
+}
+
+enum OrderStatus {
+    PACKED
+    DELIVERED
+    FINISHED
+}
+
+model Order {
+    id          String         @id @default(uuid())
+    name        String
+    lastname    String
+    phone       String
+    email       String
+    company     String
+    adress      String
+    apartment   String
+    postalCode  String
+    dateTime    DateTime?      @default(now())
+    status      OrderStatus    @default(PACKED)
+    city        String
+    country     String
+    orderNotice String?
+    receipt     String?
+    total       Int
+    products    OrderProduct[]
+}
+
+model OrderProduct {
+    id        String  @id @default(uuid())
+    order     Order   @relation(fields: [orderId], references: [id])
+    orderId   String
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    quantity  Int
 }
