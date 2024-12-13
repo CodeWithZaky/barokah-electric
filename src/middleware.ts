@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   // Check the role and redirect based on the role
 
   if (token.role !== "ADMIN") {
-    if (request.nextUrl.pathname.startsWith("/private")) {
+    if (request.nextUrl.pathname.startsWith("/admin")) {
       return NextResponse.redirect(new URL("/404", request.url));
     }
     return NextResponse.next();
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/protected/:path*",
-    "/private/:path*",
+    "/admin/:path*",
     // Match all routes except the ones that start with /auth/login, api, _next/static, _next/image, and favicon.ico
   ],
 };

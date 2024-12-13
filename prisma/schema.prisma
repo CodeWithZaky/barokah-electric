@@ -82,7 +82,6 @@ model Product {
 model ProductImage {
     id        Int      @id @default(autoincrement())
     imageURL  String
-    imageBlur String
     Product   Product? @relation(fields: [productId], references: [id]) // Many-to-one relationship with Product
     productId Int?
 }
