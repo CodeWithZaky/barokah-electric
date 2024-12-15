@@ -107,29 +107,37 @@ model CartItem {
 }
 
 enum OrderStatus {
-    PACKED
-    DELIVERED
-    FINISHED
+    PENDING // Pesanan diterima, tetapi belum diproses.
+    PROCESSING // Pesanan sedang diproses.
+    PACKED // Pesanan sudah dikemas.
+    SHIPPED // Pesanan sudah dikirim.
+    DELIVERED // Pesanan sudah diterima pelanggan.
+    CANCELLED // Pesanan dibatalkan.
+    RETURN_REQUEST // Pelanggan mengajukan pengembalian.
+    RETURNED // Pesanan berhasil dikembalikan.
+    REFUNDED // Dana pesanan telah dikembalikan.
+    FAILED // Pesanan gagal diproses (misalnya, pembayaran gagal).
+    COMPLETED // Pesanan selesai tanpa masalah.
 }
 
 model Order {
-    id          String         @id @default(uuid())
-    name        String
-    lastname    String
-    phone       String
-    email       String
-    company     String
-    adress      String
-    apartment   String
-    postalCode  String
-    dateTime    DateTime?      @default(now())
-    status      OrderStatus    @default(PACKED)
-    city        String
-    country     String
-    orderNotice String?
-    receipt     String?
-    total       Int
-    products    OrderProduct[]
+    id            String         @id @default(uuid())
+    name          String
+    lastname      String
+    phone         String
+    email         String
+    company       String
+    adress        String
+    apartment     String
+    postalCode    String
+    dateTime      DateTime?      @default(now())
+    status        OrderStatus    @default(PENDING)
+    city          String
+    country       String
+    orderNotice   String?
+    receipt       String?
+    total         Int
+    OrderProducts OrderProduct[]
 }
 
 model OrderProduct {
