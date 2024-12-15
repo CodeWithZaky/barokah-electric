@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/utils/api";
-import { UploadButton } from "@/utils/uploadthing";
+import { UploadDropzone } from "@/utils/uploadthing";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -27,7 +27,7 @@ const initialFormData: z.infer<typeof productSchema> = {
   description: "",
   price: 0,
   rate: 0,
-  published: false,
+  published: true,
   images: [],
 };
 
@@ -118,7 +118,10 @@ export default function ProductForm({
           </div>
           <div>
             <Label htmlFor="images">Images</Label>
-            <UploadButton
+            <UploadDropzone
+              appearance={{
+                button: "bg-foreground dark:text-background",
+              }}
               endpoint="imageUploader"
               onClientUploadComplete={(res) => {
                 if (res) {

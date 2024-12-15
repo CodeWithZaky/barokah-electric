@@ -13,7 +13,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { api } from "@/utils/api";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
@@ -21,9 +21,9 @@ export default function ProductList() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    router.push(`?id=${selectedProduct}`);
-  }, [selectedProduct]);
+  // useEffect(() => {
+  //   router.push(`?id=${selectedProduct}`);
+  // }, [selectedProduct]);
 
   const deleteProduct = api.product.delete.useMutation({
     onSuccess: () => {
