@@ -11,20 +11,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
+import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import Image from "next/image";
 
 export default function ProductList() {
-  const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
   const { data: products, refetch } = api.product.getAll.useQuery();
+  const setProductId = useProductIdStore((state) => state.setProductId);
 
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   router.push(`?id=${selectedProduct}`);
-  // }, [selectedProduct]);
-
+  // DELETE PRODUCT
   const deleteProduct = api.product.delete.useMutation({
     onSuccess: () => {
       toast({
@@ -50,6 +45,7 @@ export default function ProductList() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Image</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Actions</TableHead>
@@ -58,13 +54,24 @@ export default function ProductList() {
           <TableBody>
             {products?.map((product) => (
               <TableRow key={product.id}>
+                <TableCell>
+                  {product.images.map((image) => (
+                    <Image
+                      key={image.id}
+                      src={image.imageURL}
+                      alt={product.name}
+                      width={50}
+                      height={50}
+                    />
+                  ))}
+                </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>${product.price.toFixed(2)}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedProduct(product.id)}
+                    onClick={() => setProductId(product.id)}
                     className="mr-2"
                   >
                     Edit

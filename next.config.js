@@ -8,7 +8,11 @@ await import("./src/env.js");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ["localhost"], // Add your domain here if you're hosting images elsewhere
+    remotePatterns: [
+      {
+        hostname: "utfs.io",
+      },
+    ],
   },
 
   /**

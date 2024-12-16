@@ -1,12 +1,12 @@
-import CardProduct from "@/components/card-product";
 import Header from "@/components/header";
-import { useSession } from "next-auth/react";
+import { Card } from "@/components/ui/card";
+import { api } from "@/utils/api";
 import Head from "next/head";
+import Image from "next/image";
+import { Fragment } from "react";
 
 export default function Home() {
-  const session = useSession();
-
-  console.log(session);
+  const products = api.product.getAll.useQuery();
 
   return (
     <>
@@ -17,16 +17,36 @@ export default function Home() {
       </Head>
       <Header />
       <div className="grid min-h-screen grid-cols-4 items-start justify-center gap-3">
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
-        <CardProduct />
+        {products.data?.map((product) => (
+          <Fragment key={product.id}>
+            <Card className="flex flex-col gap-1 text-wrap pb-2">
+              <div className="h-[300px] w-[300px] overflow-hidden">
+                <Image
+                  src={product.images[0] ? product.images[0].imageURL : ""}
+                  width={300}
+                  height={300}
+                  alt={product.name}
+                  objectFit="cover"
+                  layout="intrinsic"
+                />
+              </div>
+              <div className="space-y-1 text-wrap px-2 text-sm">
+                <p className="text-green-700">
+                  Rp{product.price.toLocaleString("id-ID")}
+                </p>
+                <p>{product.name}</p>
+                <div className="flex justify-between">
+                  <p className="rounded-md border bg-primary px-2 text-background">
+                    +cart
+                  </p>
+                  <p className="rounded-md border bg-primary px-2 text-background">
+                    buy now
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </Fragment>
+        ))}
       </div>
     </>
   );

@@ -4,10 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
-import { UploadDropzone } from "@/utils/uploadthing";
-import { useState } from "react";
+import { UploadButton } from "@/utils/uploadthing";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { z } from "zod";
+import { toast } from "./ui/use-toast";
 
 const productSchema = z.object({
   name: z.string().min(1).max(255),
@@ -22,27 +25,65 @@ const productSchema = z.object({
   ),
 });
 
-const initialFormData: z.infer<typeof productSchema> = {
-  name: "",
-  description: "",
-  price: 0,
-  rate: 0,
-  published: true,
-  images: [],
-};
+export default function ProductForm() {
+  const [formData, setFormData] = useState<z.infer<typeof productSchema>>({
+    name: "",
+    description: "",
+    price: 0,
+    rate: 0,
+    published: true,
+    images: [],
+  });
 
-export default function ProductForm({
-  productId = null,
-}: {
-  productId?: number | null;
-}) {
-  const [formData, setFormData] =
-    useState<z.infer<typeof productSchema>>(initialFormData);
-  const createProduct = api.product.create.useMutation();
+  const createProduct = api.product.create.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Product created",
+        description: "The product has been successfully created.",
+      });
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const updateProduct = api.product.update.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Product updated",
+        description: "The product has been successfully updated.",
+      });
+    },
+  });
+
+  const productId = useProductIdStore((state) => state.productId);
+
+  const { data: productById } = api.product.getById.useQuery(
+    {
+      id: productId as number,
+    },
+    {
+      enabled: productId !== null,
+    },
+  );
+
+  useEffect(() => {
+    if (productById) {
+      setFormData({
+        name: productById.name || "",
+        description: productById.description || "",
+        price: productById.price || 0,
+        rate: productById.rate || 0,
+        published: productById.published || true,
+        images: productById.images || [],
+      });
+    }
+  }, [productById]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createProduct.mutateAsync(formData);
+    if (productId) {
+      updateProduct.mutate({ id: productId, ...formData });
+    } else {
+      createProduct.mutate(formData);
+    }
   };
 
   const handleChange = (
@@ -102,23 +143,25 @@ export default function ProductForm({
               required
             />
           </div>
-          <div>
-            <Label htmlFor="rate">Rate</Label>
-            <Input
-              id="rate"
-              name="rate"
-              type="number"
-              step="0.1"
-              min="0"
-              max="5"
-              value={formData.rate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
+          <div className="flex flex-col gap-5">
             <Label htmlFor="images">Images</Label>
-            <UploadDropzone
+            <div>
+              {formData.images.length <= 0 ? (
+                <div className="h-[200px] w-[200px] rounded-lg bg-gray-700/80" />
+              ) : (
+                formData.images.map((image, index) => (
+                  <div key={index}>
+                    <Image
+                      src={image.imageURL}
+                      alt="gambar"
+                      width={100}
+                      height={100}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+            <UploadButton
               appearance={{
                 button: "bg-foreground dark:text-background",
               }}
@@ -135,7 +178,6 @@ export default function ProductForm({
                 }
               }}
               onUploadError={(error: Error) => {
-                // Do something with the error.
                 alert(`ERROR! ${error.message}`);
               }}
             />

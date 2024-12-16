@@ -43,6 +43,9 @@ export const productRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.product.findUnique({
         where: { id: input.id },
+        include: {
+          images: true,
+        },
       });
 
       if (!product) {
@@ -56,7 +59,11 @@ export const productRouter = createTRPCRouter({
     }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const products = await ctx.db.product.findMany();
+    const products = await ctx.db.product.findMany({
+      include: {
+        images: true,
+      },
+    });
     return products;
   }),
 
