@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -10,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
 import Image from "next/image";
@@ -18,6 +16,7 @@ import Image from "next/image";
 export default function ProductList() {
   const { data: products, refetch } = api.product.getAll.useQuery();
   const setProductId = useProductIdStore((state) => state.setProductId);
+  const { toast } = useToast();
 
   // DELETE PRODUCT
   const deleteProduct = api.product.delete.useMutation({

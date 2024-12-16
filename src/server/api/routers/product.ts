@@ -63,6 +63,9 @@ export const productRouter = createTRPCRouter({
       include: {
         images: true,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
     });
     return products;
   }),

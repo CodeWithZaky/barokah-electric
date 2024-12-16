@@ -107,17 +107,17 @@ model CartItem {
 }
 
 enum OrderStatus {
-    PENDING // Pesanan diterima, tetapi belum diproses.
-    PROCESSING // Pesanan sedang diproses.
-    PACKED // Pesanan sudah dikemas.
-    SHIPPED // Pesanan sudah dikirim.
-    DELIVERED // Pesanan sudah diterima pelanggan.
-    CANCELLED // Pesanan dibatalkan.
-    RETURN_REQUEST // Pelanggan mengajukan pengembalian.
-    RETURNED // Pesanan berhasil dikembalikan.
-    REFUNDED // Dana pesanan telah dikembalikan.
-    FAILED // Pesanan gagal diproses (misalnya, pembayaran gagal).
-    COMPLETED // Pesanan selesai tanpa masalah.
+    PENDING
+    PROCESSING
+    PACKED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+    RETURN_REQUEST
+    RETURNED
+    REFUNDED
+    FAILED
+    COMPLETED
 }
 
 model Order {

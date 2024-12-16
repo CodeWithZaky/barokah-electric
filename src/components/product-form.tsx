@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
 import { UploadButton } from "@/utils/uploadthing";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { toast } from "./ui/use-toast";
 
 const productSchema = z.object({
   name: z.string().min(1).max(255),
@@ -34,6 +35,8 @@ export default function ProductForm() {
     published: true,
     images: [],
   });
+  const { toast } = useToast();
+  const route = useRouter();
 
   const createProduct = api.product.create.useMutation({
     onSuccess: () => {
@@ -41,6 +44,7 @@ export default function ProductForm() {
         title: "Product created",
         description: "The product has been successfully created.",
       });
+      route.refresh();
     },
   });
 
@@ -50,6 +54,7 @@ export default function ProductForm() {
         title: "Product updated",
         description: "The product has been successfully updated.",
       });
+      route.refresh();
     },
   });
 

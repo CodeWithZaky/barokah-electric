@@ -1,12 +1,28 @@
 import Header from "@/components/header";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import { Fragment } from "react";
 
 export default function Home() {
   const products = api.product.getAll.useQuery();
+
+  const { toast } = useToast();
+
+  const { refetch: refetchCart } = api.cart.getCart.useQuery();
+
+  const addItem = api.cart.addItem.useMutation({
+    onSuccess: () => {
+      refetchCart();
+      toast({
+        title: "Product added to cart",
+        description: "The product has been successfully added to your cart.",
+      });
+    },
+  });
 
   return (
     <>
@@ -36,12 +52,19 @@ export default function Home() {
                 </p>
                 <p>{product.name}</p>
                 <div className="flex justify-between">
-                  <p className="rounded-md border bg-primary px-2 text-background">
+                  <p
+                    className="cursor-pointer rounded-md border bg-primary px-2 text-background"
+                    onClick={() =>
+                      addItem.mutate({ productId: product.id, quantity: 1 })
+                    }
+                  >
                     +cart
                   </p>
-                  <p className="rounded-md border bg-primary px-2 text-background">
-                    buy now
-                  </p>
+                  <Link href={`/checkout?id=${product.id}`}>
+                    <p className="rounded-md border bg-primary px-2 text-background">
+                      buy now
+                    </p>
+                  </Link>
                 </div>
               </div>
             </Card>
