@@ -1,6 +1,7 @@
 import { api } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -17,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { dummyOrders } from "@/data/order-data";
 import { useToast } from "@/hooks/use-toast";
 
 // Define the form schema
@@ -79,47 +81,62 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      lastname: "",
-      phone: "",
-      email: "",
-      company: "",
-      adress: "",
-      apartment: "",
-      postalCode: "",
-      city: "",
-      country: "",
-      orderNotice: "",
-      receipt: "",
-    },
+    defaultValues: dummyOrders[0],
+    // defaultValues: {
+    //   name: "",
+    //   lastname: "",
+    //   phone: "",
+    //   email: "",
+    //   company: "",
+    //   adress: "",
+    //   apartment: "",
+    //   postalCode: "",
+    //   city: "",
+    //   country: "",
+    //   orderNotice: "",
+    // },
   });
 
-  const orders = api.order.getOrders.useQuery();
-  console.log(orders.data);
+  const { data: orders } = api.order.getOrders.useQuery();
+  console.log(orders);
+
+  useEffect(() => {
+    if (carts?.items) {
+      form.setValue("total", totalPrice);
+      form.setValue(
+        "products",
+        carts.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      );
+    }
+  }, [carts, totalPrice, form]);
 
   // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // if (!carts || !carts.items) {
-      //   toast({
-      //     title: "Error",
-      //     description:
-      //       "There was an error placing your order. Please try again.",
-      //     variant: "destructive",
-      //   });
-      // }
+      if (!carts || !carts.items) {
+        toast({
+          title: "Error",
+          description:
+            "There was an error placing your order. Please try again.",
+          variant: "destructive",
+        });
+      }
 
       const orderData = {
         ...values,
         total: totalPrice,
-        products: carts?.items
-          ? carts.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-            }))
-          : [],
+        OrderProducts: {
+          create: carts?.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        },
       };
+
+      console.log(orderData);
 
       const result = await createOrder.mutateAsync(orderData);
 
@@ -128,7 +145,7 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
         description: `Your order ID is: ${result.id}`,
       });
 
-      router.push(`/order-confirmation/${result.id}`);
+      router.push(`/user/purchase`);
     } catch (error) {
       toast({
         title: "Error",
@@ -299,19 +316,6 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="receipt"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Receipt (Optional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Button
                   type="submit"
                   className="w-full"
@@ -332,23 +336,18 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
               <p>Your cart is empty.</p>
             ) : (
               <div className="space-y-4">
-                {carts?.items.map((item) => (
-                  <>
-                    <div
-                      key={item.productId}
-                      className="flex justify-between py-2"
-                    >
-                      <div className="flex flex-col">
-                        <span>{item.product.name}</span>
-                        <span>
-                          {item.product.price} (x{item.quantity})
-                        </span>
-                      </div>
+                {carts?.items.map((item, index) => (
+                  <div key={index} className="flex justify-between py-2">
+                    <div className="flex flex-col">
+                      <span>{item.product.name}</span>
                       <span>
-                        Rp{(item.product.price * item.quantity).toFixed(2)}
+                        {item.product.price} (x{item.quantity})
                       </span>
                     </div>
-                  </>
+                    <span>
+                      Rp{(item.product.price * item.quantity).toFixed(2)}
+                    </span>
+                  </div>
                 ))}
               </div>
             )}

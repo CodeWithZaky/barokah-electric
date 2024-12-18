@@ -29,18 +29,24 @@ export const orderRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Buat data `order` tanpa menyertakan properti `products`
+      const { products, ...orderData } = input;
+      const userId = ctx.session.user.id;
+
+      // Buat `order` baru dengan relasi ke `orderProducts`
       const order = await ctx.db.order.create({
         data: {
-          ...input,
-          OrderProducts: {
-            create: input.products.map((product) => ({
+          ...orderData,
+          userId,
+          orderProducts: {
+            create: products.map((product) => ({
               productId: product.productId,
               quantity: product.quantity,
             })),
           },
         },
         include: {
-          OrderProducts: { include: { product: true } },
+          orderProducts: { include: { product: true } },
         },
       });
 
@@ -51,7 +57,7 @@ export const orderRouter = createTRPCRouter({
   getOrders: protectedProcedure.query(async ({ ctx }) => {
     const orders = await ctx.db.order.findMany({
       include: {
-        OrderProducts: {
+        orderProducts: {
           include: { product: true },
         },
       },
@@ -62,25 +68,27 @@ export const orderRouter = createTRPCRouter({
 
   // Get Order by ID
   getOrderById: protectedProcedure
-    .input(z.object({ orderId: z.string() }))
+    .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const order = await ctx.db.order.findUnique({
-        where: { id: input.orderId },
+      const userId = ctx.session.user.id;
+      const orders = await ctx.db.order.findMany({
+        where: { userId },
         include: {
-          OrderProducts: {
+          orderProducts: {
             include: { product: true },
           },
         },
+        orderBy: { dateTime: "desc" },
       });
 
-      return order;
+      return orders;
     }),
 
   // Update Order Status
   updateOrderStatus: protectedProcedure
     .input(
       z.object({
-        orderId: z.string(),
+        orderId: z.number(),
         status: z.nativeEnum(OrderStatus),
       }),
     )
@@ -95,7 +103,7 @@ export const orderRouter = createTRPCRouter({
 
   // Delete Order
   deleteOrder: protectedProcedure
-    .input(z.object({ orderId: z.string() }))
+    .input(z.object({ orderId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.order.delete({
         where: { id: input.orderId },
