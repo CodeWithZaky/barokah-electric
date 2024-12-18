@@ -12,6 +12,9 @@ const config = {
       {
         hostname: "utfs.io",
       },
+      {
+        hostname: "picsum.photos",
+      },
     ],
   },
 
