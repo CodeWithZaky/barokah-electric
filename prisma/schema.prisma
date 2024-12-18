@@ -25,6 +25,7 @@ model User {
     sessions      Session[] // One-to-many relationship with Session
     product       Product[] // One-to-many relationship with Product
     carts         Cart[] // One-to-many relationship with Cart
+    orders        Order[] // One-to-many relationship with Order
 }
 
 model Account {
@@ -121,7 +122,7 @@ enum OrderStatus {
 }
 
 model Order {
-    id            String         @id @default(uuid())
+    id            Int            @id @default(autoincrement())
     name          String
     lastname      String
     phone         String
@@ -130,21 +131,23 @@ model Order {
     adress        String
     apartment     String
     postalCode    String
-    dateTime      DateTime?      @default(now())
+    dateTime      DateTime       @default(now())
     status        OrderStatus    @default(PENDING)
     city          String
     country       String
     orderNotice   String?
     receipt       String?
     total         Int
-    OrderProducts OrderProduct[]
+    orderProducts OrderProduct[] // Corrected name to match convention
+    userId        String
+    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model OrderProduct {
-    id        String  @id @default(uuid())
-    order     Order   @relation(fields: [orderId], references: [id])
-    orderId   String
-    product   Product @relation(fields: [productId], references: [id])
+    id        Int     @id @default(autoincrement())
+    orderId   Int
     productId Int
     quantity  Int
+    order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
