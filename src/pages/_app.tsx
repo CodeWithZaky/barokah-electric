@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 import clsx from "clsx";
 
+import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -31,6 +32,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             )}
           >
             <div className="flexE w-ful mx-auto flex-col bg-background px-7">
+              <Header />
               <Component {...pageProps} />
             </div>
           </main>

@@ -7,12 +7,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { api } from "@/utils/api";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LuSearch, LuShoppingCart } from "react-icons/lu";
 
 const Header = () => {
   const { data: session, status } = useSession();
+  const { data: cartCount } = api.cart.getCartCount.useQuery();
+
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -45,7 +54,7 @@ const Header = () => {
             <Link href="/cart" className="relative">
               <LuShoppingCart className="h-6 w-6" />
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                99
+                {cartCount}
               </span>
               <span className="sr-only">Shopping Cart</span>
             </Link>

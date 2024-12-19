@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import { CarouselProduct } from "@/components/carousel";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -32,9 +32,9 @@ export default function Home() {
         <meta name="description" content="Browse our wide range of products" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="mb-8 text-3xl font-bold">Our Products</h1>
+      <main className="container mx-auto flex flex-col gap-5 px-4 py-8">
+        <CarouselProduct />
+        <h1 className="mt-8 text-3xl font-bold">Our Products</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {products.data?.map((product) => (
             <Card
