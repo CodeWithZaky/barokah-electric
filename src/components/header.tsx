@@ -15,7 +15,7 @@ import { LuSearch, LuShoppingCart } from "react-icons/lu";
 
 const Header = () => {
   const { data: session, status } = useSession();
-  const { data: cartCount } = api.cart.getCartCount.useQuery();
+  const { data: cartCount, refetch } = api.cart.getCartCount.useQuery();
 
   const pathname = usePathname();
 
@@ -24,24 +24,24 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <span className="hidden font-bold sm:inline-block">
+    <header className="top-0 z-50 sticky bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b w-full">
+      <div className="flex items-center h-16 container">
+        <Link href="/" className="flex items-center space-x-2 mr-6">
+          <span className="sm:inline-block hidden font-bold">
             BarokahElektrik
           </span>
         </Link>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="w-full max-w-sm items-center md:flex">
+        <div className="flex flex-1 justify-end items-center space-x-4">
+          <div className="md:flex items-center w-full max-w-sm">
             <form className="relative">
               <LuSearch
-                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
+                className="top-2.5 left-2.5 absolute w-4 h-4 text-muted-foreground"
                 aria-hidden="true"
               />
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-full appearance-none bg-transparent pl-8 md:w-[300px] lg:w-[300px]"
+                className="bg-transparent pl-8 w-full md:w-[300px] lg:w-[300px] appearance-none"
               />
             </form>
           </div>
@@ -52,8 +52,8 @@ const Header = () => {
             aria-label="Shopping Cart"
           >
             <Link href="/cart" className="relative">
-              <LuShoppingCart className="h-6 w-6" />
-              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+              <LuShoppingCart className="w-6 h-6" />
+              <span className="-top-2 -right-2 absolute flex justify-center items-center bg-primary rounded-full w-5 h-5 text-primary-foreground text-xs">
                 {cartCount}
               </span>
               <span className="sr-only">Shopping Cart</span>
@@ -73,9 +73,9 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
+                  className="relative rounded-full w-8 h-8"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="w-8 h-8">
                     <AvatarImage
                       src={
                         session?.user?.image ?? "https://github.com/shadcn.png"

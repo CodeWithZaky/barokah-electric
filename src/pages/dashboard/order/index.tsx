@@ -35,6 +35,8 @@ export default function OrderDashboard() {
     onSuccess: () => refetch(),
   });
 
+  const cancelledOrder = api.order.updateOrderStatus.useMutation();
+
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
   const handleStatusChange = async (
@@ -46,25 +48,27 @@ export default function OrderDashboard() {
 
   if (isLoading)
     return (
-      <div className="flex min-h-screen w-full animate-pulse items-center justify-center text-5xl">
+      <div className="flex justify-center items-center w-full min-h-screen text-5xl animate-pulse">
         Loading...
       </div>
     );
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto min-h-screen p-4">
-        <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
+      <div className="mx-auto p-4 min-h-screen container">
+        <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
         <Tabs
           defaultValue="PENDING"
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
         >
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="PENDING">Pending</TabsTrigger>
             <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
+            <TabsTrigger value="PACKED">Packed</TabsTrigger>
             <TabsTrigger value="SHIPPED">Shipped</TabsTrigger>
             <TabsTrigger value="DELIVERED">Delivered</TabsTrigger>
             <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
+            <TabsTrigger value="CANCELLED">Cancelled</TabsTrigger>
           </TabsList>
           {Object.values(OrderStatus).map((status) => (
             <TabsContent key={status} value={status}>
@@ -73,7 +77,8 @@ export default function OrderDashboard() {
                   <CardHeader>
                     <CardTitle>Order #{order.id}</CardTitle>
                     <CardDescription>
-                      Placed on: {new Date(order.dateTime).toLocaleDateString()}
+                      Placed on:{" "}
+                      {new Date(order.createdAt).toLocaleDateString()}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -82,7 +87,10 @@ export default function OrderDashboard() {
                     <ul>
                       {order.orderProducts.map((op) => (
                         <li key={op.id}>
-                          {op.product.name} x {op.quantity}
+                          {op.product.name}{" "}
+                          <span className="text-green-500">
+                            x {op.quantity}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -107,11 +115,23 @@ export default function OrderDashboard() {
                         </SelectContent>
                       </Select>
                     )}
-                    <Button
+                    {/* <Button
                       className="ml-2"
                       onClick={() => router.push(`/order/${order.id}`)}
                     >
                       View Details
+                    </Button> */}
+                    <Button
+                      className="ml-2"
+                      variant={"destructive"}
+                      onClick={() =>
+                        cancelledOrder.mutate({
+                          orderId: order.id,
+                          status: "CANCELLED",
+                        })
+                      }
+                    >
+                      Cancel
                     </Button>
                   </CardFooter>
                 </Card>

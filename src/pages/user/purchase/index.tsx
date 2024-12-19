@@ -1,25 +1,16 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 export default function PurchasePage() {
   const router = useRouter();
@@ -52,18 +43,20 @@ export default function PurchasePage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto min-h-screen p-4">
-      <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
+    <div className="mx-auto p-4 min-h-screen container">
+      <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
       >
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid grid-cols-7 w-full">
           <TabsTrigger value="PENDING">Pending</TabsTrigger>
           <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
+          <TabsTrigger value="PACKED">Packed</TabsTrigger>
           <TabsTrigger value="SHIPPED">Shipped</TabsTrigger>
           <TabsTrigger value="DELIVERED">Delivered</TabsTrigger>
           <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
+          <TabsTrigger value="CANCELLED">Cancelled</TabsTrigger>
         </TabsList>
         {Object.values(OrderStatus).map((status) => (
           <TabsContent key={status} value={status}>
@@ -72,21 +65,37 @@ export default function PurchasePage() {
                 <CardHeader>
                   <CardTitle>Order #{order.id}</CardTitle>
                   <CardDescription>
-                    Placed on: {new Date(order.dateTime).toLocaleDateString()}
+                    Placed on: {new Date(order.createdAt).toLocaleDateString()}
+                  </CardDescription>
+                  <CardDescription>
+                    Receipt Number: {order.receipt ?? ""}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p>Total: ${order.total / 100}</p>
-                  <p>Status: {order.status}</p>
+                  <div className="flex flex-col py-3">
+                    <p className="font-bold text-lg">
+                      Total: ${order.total / 100}
+                    </p>
+                    <p>Status: {order.status}</p>
+                    <p>Payment: {order.deliveryService}</p>
+                  </div>
                   <ul>
                     {order.orderProducts.map((op) => (
-                      <li key={op.id}>
-                        {op.product.name} x {op.quantity}
-                      </li>
+                      <Fragment key={op.id}>
+                        {/* <li>
+                          <Image src={op.product.image[0]} alt="product" />
+                        </li> */}
+                        <li>
+                          {op.product.name}{" "}
+                          <span className="text-green-500">
+                            x {op.quantity}
+                          </span>
+                        </li>
+                      </Fragment>
                     ))}
                   </ul>
                 </CardContent>
-                <CardFooter>
+                {/* <CardFooter>
                   {userRole === "ADMIN" && (
                     <Select
                       onValueChange={(value) =>
@@ -112,7 +121,7 @@ export default function PurchasePage() {
                   >
                     View Details
                   </Button>
-                </CardFooter>
+                </CardFooter> */}
               </Card>
             ))}
           </TabsContent>
