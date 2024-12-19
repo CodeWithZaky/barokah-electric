@@ -111,4 +111,14 @@ export const cartRouter = createTRPCRouter({
 
     return { success: true };
   }),
+
+  // get jumlah item di cart by id user
+  getCartCount: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const cart = await ctx.db.cart.findFirst({
+      where: { userId },
+      include: { items: true },
+    });
+    return cart?.items.length || 0;
+  }),
 });
