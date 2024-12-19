@@ -81,7 +81,7 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: dummyOrders[0],
+    defaultValues: dummyOrders[4],
     // defaultValues: {
     //   name: "",
     //   lastname: "",
@@ -156,9 +156,9 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <div className="mx-auto px-4 py-8 container">
+      <h1 className="mb-8 font-bold text-3xl">Checkout</h1>
+      <div className="gap-8 grid grid-cols-1 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Billing Information</CardTitle>
@@ -169,7 +169,7 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                <div className="grid grid-cols-2 gap-4">
+                <div className="gap-4 grid grid-cols-2">
                   <FormField
                     control={form.control}
                     name="name"
@@ -262,7 +262,7 @@ export default function CheckoutPage({ products, total }: CheckoutPageProps) {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="gap-4 grid grid-cols-2">
                   <FormField
                     control={form.control}
                     name="city"

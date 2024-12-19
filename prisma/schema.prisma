@@ -121,26 +121,33 @@ enum OrderStatus {
     COMPLETED
 }
 
+enum DeliveryService {
+    COD
+    JNT
+}
+
 model Order {
-    id            Int            @id @default(autoincrement())
-    name          String
-    lastname      String
-    phone         String
-    email         String
-    company       String
-    adress        String
-    apartment     String
-    postalCode    String
-    dateTime      DateTime       @default(now())
-    status        OrderStatus    @default(PENDING)
-    city          String
-    country       String
-    orderNotice   String?
-    receipt       String?
-    total         Int
-    orderProducts OrderProduct[] // Corrected name to match convention
-    userId        String
-    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id              Int             @id @default(autoincrement())
+    name            String
+    lastname        String
+    phone           String
+    email           String
+    company         String
+    adress          String
+    apartment       String
+    postalCode      String
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    status          OrderStatus     @default(PENDING)
+    city            String
+    country         String
+    orderNotice     String?
+    receipt         String?
+    total           Int
+    deliveryService DeliveryService @default(COD)
+    orderProducts   OrderProduct[]
+    userId          String
+    user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model OrderProduct {

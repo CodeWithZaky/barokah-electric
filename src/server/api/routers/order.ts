@@ -1,3 +1,4 @@
+import { receiptGenerator } from "@/utils/receiptGenerator";
 import { OrderStatus } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -32,12 +33,14 @@ export const orderRouter = createTRPCRouter({
       // Buat data `order` tanpa menyertakan properti `products`
       const { products, ...orderData } = input;
       const userId = ctx.session.user.id;
+      const receiptNumber = receiptGenerator();
 
       // Buat `order` baru dengan relasi ke `orderProducts`
       const order = await ctx.db.order.create({
         data: {
           ...orderData,
           userId,
+          receipt: receiptNumber,
           orderProducts: {
             create: products.map((product) => ({
               productId: product.productId,
@@ -78,7 +81,7 @@ export const orderRouter = createTRPCRouter({
             include: { product: true },
           },
         },
-        orderBy: { dateTime: "desc" },
+        orderBy: { createdAt: "desc" },
       });
 
       return orders;
@@ -111,4 +114,15 @@ export const orderRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  // // add receipt
+  // addReceipt: protectedProcedure
+  // .input(z.object({ orderId: z.number(), receipt: z.string() }))
+  // .mutation(async ({ ctx, input }) => {
+  //   const order = await ctx.db.order.update({
+  //     where: { id: input.orderId },
+  //     data: { receipt: input.receipt },
+  //   });
+  //   return order;
+  // }),
 });
