@@ -42,13 +42,13 @@ export default function PurchasePage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto min-h-screen p-4">
-      <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
+    <div className="mx-auto p-4 min-h-screen container">
+      <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
       >
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid grid-cols-7 w-full">
           <TabsTrigger value="PENDING">Pending</TabsTrigger>
           <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
           <TabsTrigger value="PACKED">Packed</TabsTrigger>

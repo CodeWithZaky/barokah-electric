@@ -46,20 +46,20 @@ export default function OrderDashboard() {
 
   if (isLoading)
     return (
-      <div className="flex min-h-screen w-full animate-pulse items-center justify-center text-5xl">
+      <div className="flex justify-center items-center w-full min-h-screen text-5xl animate-pulse">
         Loading...
       </div>
     );
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto min-h-screen p-4">
-        <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
+      <div className="mx-auto p-4 min-h-screen container">
+        <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
         <Tabs
           defaultValue="PENDING"
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
         >
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="PENDING">Pending</TabsTrigger>
             <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
             <TabsTrigger value="PACKED">Packed</TabsTrigger>
