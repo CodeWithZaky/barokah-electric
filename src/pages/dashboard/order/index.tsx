@@ -18,12 +18,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import DashboardLayout from "../layout";
 
 export default function OrderDashboard() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
 
   const session = useSession();
@@ -82,8 +80,14 @@ export default function OrderDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p>Total: ${order.total / 100}</p>
-                    <p>Status: {order.status}</p>
+                    <div className="flex flex-col py-3">
+                      <p className="text-lg font-bold">
+                        Total: ${order.total / 100}
+                      </p>
+                      <p>Status: {order.status}</p>
+                      <p>Delivery: {order.deliveryService}</p>
+                      <p>Payment: COD only</p>
+                    </div>
                     <ul>
                       {order.orderProducts.map((op) => (
                         <li key={op.id}>
