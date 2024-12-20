@@ -9,15 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 
 export default function PurchasePage() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
 
   const session = useSession();
-  const userRole = session.data?.user.role;
 
   const {
     data: orders,
@@ -33,6 +30,8 @@ export default function PurchasePage() {
 
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
+  console.log(filteredOrders);
+
   const handleStatusChange = async (
     orderId: number,
     newStatus: OrderStatus,
@@ -43,13 +42,13 @@ export default function PurchasePage() {
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="mx-auto p-4 min-h-screen container">
-      <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
+    <div className="container mx-auto min-h-screen p-4">
+      <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
       >
-        <TabsList className="grid grid-cols-7 w-full">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="PENDING">Pending</TabsTrigger>
           <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
           <TabsTrigger value="PACKED">Packed</TabsTrigger>
@@ -73,17 +72,18 @@ export default function PurchasePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col py-3">
-                    <p className="font-bold text-lg">
+                    <p className="text-lg font-bold">
                       Total: ${order.total / 100}
                     </p>
                     <p>Status: {order.status}</p>
-                    <p>Payment: {order.deliveryService}</p>
+                    <p>Delivery: {order.deliveryService}</p>
+                    <p>Payment: COD only</p>
                   </div>
                   <ul>
                     {order.orderProducts.map((op) => (
                       <Fragment key={op.id}>
                         {/* <li>
-                          <Image src={op.product.image[0]} alt="product" />
+                          <Image src={op.product.images[0]} alt="product" />
                         </li> */}
                         <li>
                           {op.product.name}{" "}

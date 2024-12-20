@@ -78,7 +78,13 @@ export const orderRouter = createTRPCRouter({
         where: { userId },
         include: {
           orderProducts: {
-            include: { product: true },
+            include: {
+              product: {
+                include: {
+                  images: true,
+                },
+              },
+            },
           },
         },
         orderBy: { createdAt: "desc" },

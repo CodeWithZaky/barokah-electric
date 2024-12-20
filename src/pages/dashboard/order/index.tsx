@@ -18,12 +18,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import DashboardLayout from "../layout";
 
 export default function OrderDashboard() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
 
   const session = useSession();
@@ -48,20 +46,20 @@ export default function OrderDashboard() {
 
   if (isLoading)
     return (
-      <div className="flex justify-center items-center w-full min-h-screen text-5xl animate-pulse">
+      <div className="flex min-h-screen w-full animate-pulse items-center justify-center text-5xl">
         Loading...
       </div>
     );
 
   return (
     <DashboardLayout>
-      <div className="mx-auto p-4 min-h-screen container">
-        <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
+      <div className="container mx-auto min-h-screen p-4">
+        <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
         <Tabs
           defaultValue="PENDING"
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
         >
-          <TabsList className="grid grid-cols-7 w-full">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="PENDING">Pending</TabsTrigger>
             <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
             <TabsTrigger value="PACKED">Packed</TabsTrigger>
@@ -82,8 +80,14 @@ export default function OrderDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p>Total: ${order.total / 100}</p>
-                    <p>Status: {order.status}</p>
+                    <div className="flex flex-col py-3">
+                      <p className="text-lg font-bold">
+                        Total: ${order.total / 100}
+                      </p>
+                      <p>Status: {order.status}</p>
+                      <p>Delivery: {order.deliveryService}</p>
+                      <p>Payment: COD only</p>
+                    </div>
                     <ul>
                       {order.orderProducts.map((op) => (
                         <li key={op.id}>

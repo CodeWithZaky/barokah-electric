@@ -144,7 +144,7 @@ model Order {
     orderNotice     String?
     receipt         String?
     total           Int
-    deliveryService DeliveryService @default(COD)
+    deliveryService DeliveryService @default(JNT)
     orderProducts   OrderProduct[]
     userId          String
     user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
