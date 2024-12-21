@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -5,88 +6,138 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
+import {
+  Box,
+  CheckCircle,
+  Clock,
+  Package,
+  ShoppingBag,
+  Truck,
+  XCircle,
+} from "lucide-react";
 import Image from "next/image";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 
 export default function PurchasePage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
-
   const { data: orders, isLoading } = api.order.getOrderUserId.useQuery();
 
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+      </div>
+    );
+
+  const statusIcons = {
+    PENDING: <Clock className="h-5 w-5" />,
+    PROCESSING: <Package className="h-5 w-5" />,
+    PACKED: <Box className="h-5 w-5" />,
+    SHIPPED: <Truck className="h-5 w-5" />,
+    DELIVERED: <ShoppingBag className="h-5 w-5" />,
+    COMPLETED: <CheckCircle className="h-5 w-5" />,
+    CANCELLED: <XCircle className="h-5 w-5" />,
+  };
 
   return (
     <div className="container mx-auto min-h-screen p-4">
-      <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
+      <h1 className="mb-6 text-center text-3xl font-bold text-primary">
+        Pesanan Saya
+      </h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
+        className="rounded-lg shadow-lg"
       >
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="PENDING">Pending</TabsTrigger>
-          <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
-          <TabsTrigger value="PACKED">Packed</TabsTrigger>
-          <TabsTrigger value="SHIPPED">Shipped</TabsTrigger>
-          <TabsTrigger value="DELIVERED">Delivered</TabsTrigger>
-          <TabsTrigger value="COMPLETED">Completed</TabsTrigger>
-          <TabsTrigger value="CANCELLED">Cancelled</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-7 gap-2">
+          {Object.entries(statusIcons).map(([status, icon]) => (
+            <TabsTrigger
+              key={status}
+              value={status}
+              className="flex items-center justify-center gap-2"
+            >
+              {icon}
+              <span className="hidden sm:inline">{status}</span>
+            </TabsTrigger>
+          ))}
         </TabsList>
         {Object.values(OrderStatus).map((status) => (
           <TabsContent key={status} value={status}>
             {filteredOrders?.map((order) => (
-              <Card key={order.id} className="mb-4">
-                <CardHeader>
-                  <CardTitle>Order #{order.id}</CardTitle>
-                  <CardDescription>
-                    Placed on: {new Date(order.createdAt).toLocaleDateString()}
-                  </CardDescription>
-                  <CardDescription>
-                    Receipt Number: {order.receipt ?? ""}
+              <Card
+                key={order.id}
+                className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
+              >
+                <CardHeader className="bg-primary/5">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg sm:text-xl">
+                      Order #{order.id}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-sm">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-sm sm:text-base">
+                    Nomor Resi: {order.receipt ?? "Belum tersedia"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col py-3">
-                    <p className="text-lg font-bold">
-                      Total: ${order.total / 100}
-                    </p>
-                    <p>Status: {order.status}</p>
-                    <p>Delivery: {order.shippingMethod}</p>
-                    <p>Payment: COD only</p>
+                <CardContent className="space-y-6 pt-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                    <div className="flex-1">
+                      <h3 className="mb-2 font-semibold">Alamat Tujuan:</h3>
+                      <p className="text-sm">{order.name}</p>
+                      <p className="text-sm">{order.adress}</p>
+                      <p className="text-sm">
+                        {order.city}, {order.province}, ID, {order.postalCode}
+                      </p>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="mb-2 font-semibold">
+                        Informasi Pengiriman:
+                      </h3>
+                      <p className="text-sm">Metode: {order.shippingMethod}</p>
+                      <p className="text-sm">
+                        Pembayaran: {order.Payment?.paymentMethod}
+                      </p>
+                    </div>
                   </div>
-                  <ul>
+                  <Separator />
+                  <ul className="space-y-4">
                     {order.orderProducts.map((op) => (
-                      <Fragment key={op.id}>
-                        <li>
-                          <Image
-                            src={op.product.images[0]?.imageURL as string}
-                            alt="product"
-                            width={100}
-                            height={100}
-                          />
-                        </li>
-                        <li>
-                          {op.product.name}{" "}
-                          <span className="text-green-500">
-                            x {op.quantity}
-                          </span>
-                        </li>
-                      </Fragment>
+                      <li key={op.id} className="flex items-center gap-4">
+                        <Image
+                          src={op.product.images[0]?.imageURL as string}
+                          alt={op.product.name}
+                          width={80}
+                          height={80}
+                          className="rounded-md object-cover"
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium">{op.product.name}</p>
+                          <p className="text-sm text-gray-500">
+                            Qty: {op.quantity}
+                          </p>
+                        </div>
+                        <p className="font-semibold">
+                          Rp{op.product.price.toLocaleString()}
+                        </p>
+                      </li>
                     ))}
                   </ul>
+                  <Separator />
+                  <div className="flex items-center justify-between pt-2">
+                    <p className="text-lg font-semibold">Total Pesanan:</p>
+                    <p className="text-xl font-bold text-primary">
+                      Rp{(order.total / 100).toLocaleString()}
+                    </p>
+                  </div>
                 </CardContent>
-                {/* <CardFooter>
-                  <Button
-                    className="ml-2"
-                    onClick={() => router.push(`/order/${order.id}`)}
-                  >
-                    View Details
-                  </Button>
-                </CardFooter> */}
               </Card>
             ))}
           </TabsContent>

@@ -90,6 +90,11 @@ export const orderRouter = createTRPCRouter({
             },
           },
         },
+        Payment: {
+          select: {
+            paymentMethod: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

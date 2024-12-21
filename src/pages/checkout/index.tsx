@@ -93,6 +93,13 @@ export default function CheckoutPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      phone: "",
+      email: "",
+      adress: "",
+      postalCode: "",
+      city: "",
+      province: "",
       shippingMethod: ShippingMethod.JNE,
       paymentMethod: PaymentMethod.BANK_TRANSFER,
       bank: BankType.BRI,
