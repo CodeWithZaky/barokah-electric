@@ -1,385 +1,403 @@
+"use client";
+
 import { api } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { LuFileEdit, LuMapPin } from "react-icons/lu";
 import * as z from "zod";
 
+import { AddressModal } from "@/components/address-modal";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { dummyOrders } from "@/data/order-data";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import useSelectedItemStore from "@/stores/selected-cart-item-id";
 
-// Define the form schema
+const ShippingMethod = {
+  JNE: "JNE",
+  JNT: "JNT",
+  SICEPAT: "SICEPAT",
+  POS_INDONESIA: "POS_INDONESIA",
+  TIKI: "TIKI",
+} as const;
+
+const PaymentMethod = {
+  COD: "COD",
+  BANK_TRANSFER: "BANK_TRANSFER",
+} as const;
+
+const BankType = {
+  BRI: "BRI",
+  BNI: "BNI",
+  MANDIRI: "MANDIRI",
+} as const;
+
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  lastname: z
-    .string()
-    .min(2, { message: "Last name must be at least 2 characters." }),
+  name: z.string().min(2, { message: "Nama harus minimal 2 karakter." }),
   phone: z
     .string()
-    .min(6, { message: "Phone number must be at least 6 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  company: z.string(),
-  adress: z
-    .string()
-    .min(5, { message: "Address must be at least 5 characters." }),
-  apartment: z.string(),
+    .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
+  email: z.string().email({ message: "Alamat email tidak valid." }),
+  adress: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
   postalCode: z
     .string()
-    .min(5, { message: "Postal code must be at least 5 characters." }),
-  city: z.string().min(2, { message: "City must be at least 2 characters." }),
-  country: z
+    .min(5, { message: "Kode pos harus minimal 5 karakter." }),
+  city: z.string().min(2, { message: "Kota harus minimal 2 karakter." }),
+  province: z
     .string()
-    .min(2, { message: "Country must be at least 2 characters." }),
-  total: z.number(),
-  products: z.array(
-    z.object({
-      productId: z.number(),
-      quantity: z.number().min(1),
-    }),
-  ),
-
-  orderNotice: z.string().optional(),
-  receipt: z.string().optional(),
+    .min(2, { message: "Provinsi harus minimal 2 karakter." }),
+  shippingMethod: z.nativeEnum(ShippingMethod),
+  paymentMethod: z.nativeEnum(PaymentMethod),
+  bank: z.nativeEnum(BankType).optional(),
+  notes: z.string().optional(),
 });
 
-type CheckoutPageProps = {
-  products: Array<{
-    productId: number;
-    name: string;
-    price: number;
-    quantity: number;
-  }>;
-  total: number;
-};
+const addressFormSchema = z.object({
+  name: z.string().min(2, { message: "Nama harus minimal 2 karakter." }),
+  phone: z
+    .string()
+    .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
+  email: z.string().email({ message: "Alamat email tidak valid." }),
+  adress: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
+  postalCode: z
+    .string()
+    .min(5, { message: "Kode pos harus minimal 5 karakter." }),
+  city: z.string().min(2, { message: "Kota harus minimal 2 karakter." }),
+  province: z
+    .string()
+    .min(2, { message: "Provinsi harus minimal 2 karakter." }),
+});
 
-export default function CheckoutPage({ products, total }: CheckoutPageProps) {
+export default function CheckoutPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const createOrder = api.order.createOrder.useMutation();
-  // const searchParams = useSearchParams();
-  const { data: carts } = api.cart.getCart.useQuery();
+  const { selectedItems } = useSelectedItemStore();
 
-  const totalPrice =
-    carts?.items.reduce(
+  const { data: carts, isLoading } = api.cart.getCartItemsByIds.useQuery({
+    cartItemIds: selectedItems,
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      shippingMethod: ShippingMethod.JNE,
+      paymentMethod: PaymentMethod.BANK_TRANSFER,
+      bank: BankType.BRI,
+    },
+  });
+
+  const subtotal =
+    carts?.reduce(
       (total, item) => total + item.quantity * item.product.price,
       0,
     ) || 0;
 
-  // Initialize the form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: dummyOrders[4],
-    // defaultValues: {
-    //   name: "",
-    //   lastname: "",
-    //   phone: "",
-    //   email: "",
-    //   company: "",
-    //   adress: "",
-    //   apartment: "",
-    //   postalCode: "",
-    //   city: "",
-    //   country: "",
-    //   orderNotice: "",
-    // },
-  });
+  const shippingCosts = {
+    [ShippingMethod.JNE]: 15000,
+    [ShippingMethod.JNT]: 14000,
+    [ShippingMethod.SICEPAT]: 16000,
+    [ShippingMethod.POS_INDONESIA]: 18000,
+    [ShippingMethod.TIKI]: 17000,
+  };
 
-  const { data: orders } = api.order.getOrders.useQuery();
-  console.log(orders);
+  const shippingCost = shippingCosts[form.watch("shippingMethod")]
+    ? shippingCosts[form.watch("shippingMethod")]
+    : shippingCosts[ShippingMethod.JNE];
+  // shippingCosts[form.watch("shippingMethod") as keyof typeof ShippingMethod];
+  const total = subtotal + shippingCost;
 
-  useEffect(() => {
-    if (carts?.items) {
-      form.setValue("total", totalPrice);
-      form.setValue(
-        "products",
-        carts.items.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-      );
-    }
-  }, [carts, totalPrice, form]);
+  console.log({ shippingCost });
 
-  // Handle form submission
+  const handleAddressSubmit = (values: z.infer<typeof addressFormSchema>) => {
+    form.reset(values);
+    setIsAddressModalOpen(false);
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      if (!carts || !carts.items) {
+      if (!carts?.length) {
         toast({
           title: "Error",
-          description:
-            "There was an error placing your order. Please try again.",
+          description: "Keranjang belanja kosong",
           variant: "destructive",
         });
+        return;
       }
 
       const orderData = {
         ...values,
-        total: totalPrice,
-        OrderProducts: {
-          create: carts?.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          })),
-        },
+        total,
+        products: carts.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
       };
 
       console.log(orderData);
-
       const result = await createOrder.mutateAsync(orderData);
 
       toast({
-        title: "Order placed successfully",
-        description: `Your order ID is: ${result.id}`,
+        title: "Pesanan berhasil dibuat",
+        description: `ID Pesanan: ${result.id}`,
       });
 
-      router.push(`/user/purchase`);
+      router.push("/user/purchase");
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was an error placing your order. Please try again.",
+        description: "Gagal membuat pesanan. Silakan coba lagi.",
         variant: "destructive",
       });
     }
   }
 
-  return (
-    <div className="mx-auto px-4 py-8 container">
-      <h1 className="mb-8 font-bold text-3xl">Checkout</h1>
-      <div className="gap-8 grid grid-cols-1 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Billing Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <div className="gap-4 grid grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastname"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="company"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company (Optional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="adress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="apartment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Apartment (Optional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="gap-4 grid grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Postal Code</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="orderNotice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Order Notice (Optional)</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  // disabled={createOrder.isPending}
-                >
-                  {createOrder.isPending ? "Processing..." : "Place Order"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {carts?.items.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <div className="space-y-4">
-                {carts?.items.map((item, index) => (
-                  <div key={index} className="flex justify-between py-2">
-                    <div className="flex flex-col">
-                      <span>{item.product.name}</span>
-                      <span>
-                        {item.product.price} (x{item.quantity})
-                      </span>
-                    </div>
-                    <span>
-                      Rp{(item.product.price * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-            <Separator className="my-4" />
-            <div className="flex justify-between font-bold">
-              <span>Total</span>
-              <span>Rp{totalPrice.toFixed(2)}</span>
-            </div>
-          </CardContent>
-        </Card>
+  return (
+    <div className="mx-auto min-h-screen max-w-4xl space-y-4 p-4">
+      <div className="rounded-lg p-4 shadow-sm">
+        <div className="mb-4 flex items-center justify-between border-b pb-4">
+          <div className="flex items-center gap-2">
+            <LuMapPin className="h-5 w-5 text-primary" />
+            <span className="font-medium">Alamat Pengiriman</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-primary"
+            onClick={() => setIsAddressModalOpen(true)}
+          >
+            <LuFileEdit className="mr-2 h-4 w-4" />
+            Ubah
+          </Button>
+        </div>
+        <div className="space-y-1 text-sm">
+          <p className="font-medium">{form.watch("name") || "Nama Penerima"}</p>
+          <p className="text-muted-foreground">
+            {form.watch("phone") || "Nomor Telepon"}
+          </p>
+          <p className="text-muted-foreground">
+            {form.watch("adress") || "Alamat Lengkap"}
+          </p>
+        </div>
       </div>
+
+      <div className="rounded-lg shadow-sm">
+        <div className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 border-b p-4 text-sm text-muted-foreground">
+          <div>Produk</div>
+          <div className="text-center">Harga Satuan</div>
+          <div className="text-center">Kuantitas</div>
+          <div className="text-center">Total Harga</div>
+        </div>
+        <div className="divide-y">
+          {carts?.map((item) => (
+            <div
+              key={item.id}
+              className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 p-4"
+            >
+              <div className="flex gap-4">
+                <div className="h-16 w-16 overflow-hidden rounded border">
+                  <Image
+                    src={item.product.images[0]?.imageURL || "/placeholder.svg"}
+                    alt={item.product.name}
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{item.product.name}</p>
+                </div>
+              </div>
+              <div className="text-center">
+                Rp{item.product.price.toLocaleString()}
+              </div>
+              <div className="text-center">{item.quantity}</div>
+              <div className="text-center font-medium">
+                Rp{(item.quantity * item.product.price).toLocaleString()}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="border-t p-4">
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Pesan untuk penjual..."
+              className="max-w-xs"
+              {...form.register("notes")}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg p-4 shadow-sm">
+        <div className="mb-4 font-medium">Metode Pengiriman</div>
+        <Form {...form}>
+          <FormField
+            control={form.control}
+            name="shippingMethod"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="space-y-2"
+                  >
+                    {Object.entries(shippingCosts).map(([method, cost]) => (
+                      <div
+                        key={method}
+                        className="flex items-center justify-between rounded-lg border p-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value={method} id={method} />
+                          <Label htmlFor={method}>{method}</Label>
+                        </div>
+                        <span>Rp{cost.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </Form>
+      </div>
+
+      <div className="rounded-lg p-4 shadow-sm">
+        <div className="mb-4 font-medium">Metode Pembayaran</div>
+        <Form {...form}>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value === PaymentMethod.COD) {
+                          form.setValue("bank", undefined);
+                        }
+                      }}
+                      defaultValue={field.value}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center space-x-2 rounded-lg border p-4">
+                        <RadioGroupItem value={PaymentMethod.COD} id="cod" />
+                        <Label htmlFor="cod">Bayar di Tempat (COD)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2 rounded-lg border p-4">
+                        <RadioGroupItem
+                          value={PaymentMethod.BANK_TRANSFER}
+                          id="bank"
+                        />
+                        <Label htmlFor="bank">Transfer Bank</Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {form.watch("paymentMethod") === PaymentMethod.BANK_TRANSFER && (
+              <FormField
+                control={form.control}
+                name="bank"
+                render={({ field }) => (
+                  <FormItem className="ml-6">
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-2"
+                      >
+                        {Object.values(BankType).map((bank) => (
+                          <div
+                            key={bank}
+                            className="flex items-center space-x-2 rounded-lg border p-4"
+                          >
+                            <RadioGroupItem
+                              value={bank}
+                              id={bank.toLowerCase()}
+                            />
+                            <Label htmlFor={bank.toLowerCase()}>
+                              Bank {bank}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+        </Form>
+      </div>
+
+      <div className="rounded-lg p-4 shadow-sm">
+        <div className="mb-4 font-medium">Voucher</div>
+        <div className="flex gap-2">
+          <Input placeholder="Masukkan kode voucher" />
+          <Button variant="outline">Gunakan</Button>
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 rounded-lg p-4 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm text-muted-foreground">
+                Total Pesanan ({carts?.length || 0} Produk):
+              </span>
+              <span className="text-2xl font-bold text-primary">
+                Rp{total.toLocaleString()}
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Total Produk: Rp{subtotal.toLocaleString()}
+              <br />
+              Total Ongkos Kirim: Rp
+              {shippingCost.toLocaleString()}
+            </div>
+          </div>
+          <Button
+            size="lg"
+            className="px-8"
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={createOrder.isPending}
+          >
+            {createOrder.isPending ? "Memproses..." : "Buat Pesanan"}
+          </Button>
+        </div>
+      </div>
+
+      <AddressModal
+        open={isAddressModalOpen}
+        onOpenChange={setIsAddressModalOpen}
+        onSubmit={handleAddressSubmit}
+        defaultValues={form.getValues()}
+      />
     </div>
   );
 }
-
-// export async function getServerSideProps() {
-//   // In a real application, you would fetch this data from your API or state management
-//   const products = [
-//     { productId: 101, name: "Product 1", price: 25, quantity: 2 },
-//     { productId: 102, name: "Product 2", price: 50, quantity: 1 },
-//   ];
-
-//   const total = products.reduce(
-//     (sum, product) => sum + product.price * product.quantity,
-//     0,
-//   );
-
-//   return {
-//     props: {
-//       products,
-//       total,
-//     },
-//   };
-// }

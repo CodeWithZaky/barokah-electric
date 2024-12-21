@@ -1,5 +1,5 @@
 import { receiptGenerator } from "@/utils/receiptGenerator";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, PaymentMethod, ShippingMethod } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -9,18 +9,18 @@ export const orderRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        lastname: z.string(),
         phone: z.string(),
         email: z.string(),
-        company: z.string(),
         adress: z.string(),
-        apartment: z.string(),
         postalCode: z.string(),
         city: z.string(),
-        country: z.string(),
-        orderNotice: z.string().optional(),
+        province: z.string(),
+        notes: z.string().optional(),
         receipt: z.string().optional(),
         total: z.number(),
+        paymentMethod: z.nativeEnum(PaymentMethod),
+        shippingMethod: z.nativeEnum(ShippingMethod),
+        bank: z.string().optional(),
         products: z.array(
           z.object({
             productId: z.number(),
@@ -31,7 +31,7 @@ export const orderRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Buat data `order` tanpa menyertakan properti `products`
-      const { products, ...orderData } = input;
+      const { products, paymentMethod, bank, ...orderData } = input;
       const userId = ctx.session.user.id;
       const receiptNumber = receiptGenerator();
 
@@ -46,6 +46,12 @@ export const orderRouter = createTRPCRouter({
               productId: product.productId,
               quantity: product.quantity,
             })),
+          },
+          Payment: {
+            create: {
+              paymentMethod,
+              bank,
+            },
           },
         },
         include: {
@@ -69,29 +75,27 @@ export const orderRouter = createTRPCRouter({
     return orders;
   }),
 
-  // Get Order by ID
-  getOrderById: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id;
-      const orders = await ctx.db.order.findMany({
-        where: { userId },
-        include: {
-          orderProducts: {
-            include: {
-              product: {
-                include: {
-                  images: true,
-                },
+  // Get Order by user ID
+  getOrderUserId: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const orders = await ctx.db.order.findMany({
+      where: { userId },
+      include: {
+        orderProducts: {
+          include: {
+            product: {
+              include: {
+                images: true,
               },
             },
           },
         },
-        orderBy: { createdAt: "desc" },
-      });
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-      return orders;
-    }),
+    return orders;
+  }),
 
   // Update Order Status
   updateOrderStatus: protectedProcedure
@@ -120,15 +124,4 @@ export const orderRouter = createTRPCRouter({
 
       return { success: true };
     }),
-
-  // // add receipt
-  // addReceipt: protectedProcedure
-  // .input(z.object({ orderId: z.number(), receipt: z.string() }))
-  // .mutation(async ({ ctx, input }) => {
-  //   const order = await ctx.db.order.update({
-  //     where: { id: input.orderId },
-  //     data: { receipt: input.receipt },
-  //   });
-  //   return order;
-  // }),
 });

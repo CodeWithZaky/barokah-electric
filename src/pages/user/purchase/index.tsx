@@ -8,47 +8,26 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
 import { OrderStatus } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { Fragment, useState } from "react";
 
 export default function PurchasePage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
 
-  const session = useSession();
-
-  const {
-    data: orders,
-    isLoading,
-    refetch,
-  } = api.order.getOrderById.useQuery({
-    userId: session.data?.user.id as string,
-  });
-
-  const updateOrderStatus = api.order.updateOrderStatus.useMutation({
-    onSuccess: () => refetch(),
-  });
+  const { data: orders, isLoading } = api.order.getOrderUserId.useQuery();
 
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
-
-  console.log(filteredOrders);
-
-  const handleStatusChange = async (
-    orderId: number,
-    newStatus: OrderStatus,
-  ) => {
-    await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
-  };
 
   if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="mx-auto p-4 min-h-screen container">
-      <h1 className="mb-4 font-bold text-2xl">My Purchases</h1>
+    <div className="container mx-auto min-h-screen p-4">
+      <h1 className="mb-4 text-2xl font-bold">My Purchases</h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
       >
-        <TabsList className="grid grid-cols-7 w-full">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="PENDING">Pending</TabsTrigger>
           <TabsTrigger value="PROCESSING">Processing</TabsTrigger>
           <TabsTrigger value="PACKED">Packed</TabsTrigger>
@@ -76,15 +55,20 @@ export default function PurchasePage() {
                       Total: ${order.total / 100}
                     </p>
                     <p>Status: {order.status}</p>
-                    <p>Delivery: {order.deliveryService}</p>
+                    <p>Delivery: {order.shippingMethod}</p>
                     <p>Payment: COD only</p>
                   </div>
                   <ul>
                     {order.orderProducts.map((op) => (
                       <Fragment key={op.id}>
-                        {/* <li>
-                          <Image src={op.product.images[0]} alt="product" />
-                        </li> */}
+                        <li>
+                          <Image
+                            src={op.product.images[0]?.imageURL as string}
+                            alt="product"
+                            width={100}
+                            height={100}
+                          />
+                        </li>
                         <li>
                           {op.product.name}{" "}
                           <span className="text-green-500">
@@ -96,25 +80,6 @@ export default function PurchasePage() {
                   </ul>
                 </CardContent>
                 {/* <CardFooter>
-                  {userRole === "ADMIN" && (
-                    <Select
-                      onValueChange={(value) =>
-                        handleStatusChange(order.id, value as OrderStatus)
-                      }
-                      defaultValue={order.status}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Change status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(OrderStatus).map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {status}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
                   <Button
                     className="ml-2"
                     onClick={() => router.push(`/order/${order.id}`)}

@@ -7,7 +7,17 @@ export const cartRouter = createTRPCRouter({
     const userId = ctx.session.user.id;
     const cart = await ctx.db.cart.findFirst({
       where: { userId },
-      include: { items: { include: { product: true } } },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
+      },
     });
     return cart || { items: [] }; // Return empty cart if not found
   }),
@@ -66,6 +76,28 @@ export const cartRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  // get cart item by id
+  // get cart items by ids
+  getCartItemsByIds: protectedProcedure
+    .input(
+      z.object({
+        cartItemIds: z.array(z.number()),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const cartItems = await ctx.db.cartItem.findMany({
+        where: { id: { in: input.cartItemIds } },
+        include: {
+          product: {
+            include: {
+              images: true,
+            },
+          },
+        },
+      });
+      return cartItems;
+    }),
+
   // Update the quantity of an item in the cart
   updateItem: protectedProcedure
     .input(
@@ -120,5 +152,63 @@ export const cartRouter = createTRPCRouter({
       include: { items: true },
     });
     return cart?.items.length || 0;
+  }),
+
+  // update checked cart item
+  updateCheckedItem: protectedProcedure
+    .input(
+      z.object({
+        cartItemId: z.number(),
+        checked: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const updatedItem = await ctx.db.cartItem.update({
+        where: { id: input.cartItemId },
+        data: { checked: input.checked },
+      });
+      return updatedItem;
+    }),
+
+  // update checked all cart item
+  updateCheckedAllItem: protectedProcedure
+    .input(
+      z.object({
+        checked: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const cart = await ctx.db.cart.findFirst({
+        where: { userId },
+      });
+      if (cart) {
+        await ctx.db.cartItem.updateMany({
+          where: { cartId: cart.id },
+          data: { checked: input.checked },
+        });
+      }
+      return { success: true };
+    }),
+
+  // get cart by checked item
+  getCartByChecked: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const cart = await ctx.db.cart.findFirst({
+      where: { userId },
+      include: {
+        items: {
+          where: { checked: true },
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return cart || { items: [] }; // Return empty cart if not found
   }),
 });
