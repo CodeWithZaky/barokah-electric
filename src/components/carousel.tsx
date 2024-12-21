@@ -1,6 +1,3 @@
-import Autoplay from "embla-carousel-autoplay";
-import * as React from "react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -9,6 +6,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { BANNERS } from "@/data/banners";
+import Autoplay from "embla-carousel-autoplay";
+import Image from "next/image";
+import * as React from "react";
 
 export function CarouselProduct() {
   const plugin = React.useRef(
@@ -21,16 +22,22 @@ export function CarouselProduct() {
         plugins={[plugin.current]}
         onMouseEnter={plugin.current.stop}
         onMouseLeave={plugin.current.reset}
+        opts={{
+          loop: true,
+        }}
       >
         <CarouselContent className="w-full">
-          {Array.from({ length: 5 }).map((_, index) => (
+          {BANNERS.map((item, index) => (
             <CarouselItem key={index}>
               <div className="p-1">
                 <Card>
-                  <CardContent className="flex aspect-square h-[300px] w-full items-center justify-center p-6">
-                    <span className="text-4xl font-semibold text-white">
-                      {index + 1}
-                    </span>
+                  <CardContent className="relative aspect-square h-[300px] w-full items-center justify-center p-0">
+                    <Image
+                      src={item.src}
+                      alt={item.alt}
+                      fill
+                      className="rounded-lg object-cover"
+                    />
                   </CardContent>
                 </Card>
               </div>
