@@ -30,7 +30,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/protected/:path*",
+    "/cart/:path*",
+    "/checkout/:path*",
+    "/user/:path*",
     "/dashboard/:path*",
     // Match all routes except the ones that start with /auth/login, api, _next/static, _next/image, and favicon.ico
   ],
