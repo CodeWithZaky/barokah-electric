@@ -30,40 +30,40 @@ export default function PurchasePage() {
 
   if (isLoading)
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="border-primary border-t-2 border-b-2 rounded-full w-32 h-32 animate-spin"></div>
       </div>
     );
 
   const statusIcons = {
-    PENDING: <Clock className="h-5 w-5" />,
-    PROCESSING: <Package className="h-5 w-5" />,
-    PACKED: <Box className="h-5 w-5" />,
-    SHIPPED: <Truck className="h-5 w-5" />,
-    DELIVERED: <ShoppingBag className="h-5 w-5" />,
-    COMPLETED: <CheckCircle className="h-5 w-5" />,
-    CANCELLED: <XCircle className="h-5 w-5" />,
+    PENDING: <Clock className="w-5 h-5" />,
+    PROCESSING: <Package className="w-5 h-5" />,
+    PACKED: <Box className="w-5 h-5" />,
+    SHIPPED: <Truck className="w-5 h-5" />,
+    DELIVERED: <ShoppingBag className="w-5 h-5" />,
+    COMPLETED: <CheckCircle className="w-5 h-5" />,
+    CANCELLED: <XCircle className="w-5 h-5" />,
   };
 
   return (
-    <div className="container mx-auto min-h-screen p-4">
-      <h1 className="mb-6 text-center text-3xl font-bold text-primary">
+    <div className="mx-auto p-4 min-h-screen container">
+      <h1 className="mb-6 font-bold text-3xl text-center text-primary">
         Pesanan Saya
       </h1>
       <Tabs
         defaultValue="PENDING"
         onValueChange={(value) => setActiveTab(value as OrderStatus)}
-        className="rounded-lg shadow-lg"
+        className="shadow-lg rounded-lg"
       >
-        <TabsList className="grid w-full grid-cols-7 gap-2">
+        <TabsList className="gap-2 grid grid-cols-7 w-full">
           {Object.entries(statusIcons).map(([status, icon]) => (
             <TabsTrigger
               key={status}
               value={status}
-              className="flex items-center justify-center gap-2"
+              className="flex justify-center items-center gap-2"
             >
               {icon}
-              <span className="hidden sm:inline">{status}</span>
+              <span className="sm:inline hidden">{status}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -72,10 +72,10 @@ export default function PurchasePage() {
             {filteredOrders?.map((order) => (
               <Card
                 key={order.id}
-                className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
+                className="hover:shadow-xl mb-6 transition-shadow duration-300 overflow-hidden"
               >
                 <CardHeader className="bg-primary/5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex justify-between items-center">
                     <CardTitle className="text-lg sm:text-xl">
                       Order #{order.id}
                     </CardTitle>
@@ -88,7 +88,7 @@ export default function PurchasePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                  <div className="flex sm:flex-row flex-col sm:items-start gap-4">
                     <div className="flex-1">
                       <h3 className="mb-2 font-semibold">Alamat Tujuan:</h3>
                       <p className="text-sm">{order.name}</p>
@@ -120,7 +120,7 @@ export default function PurchasePage() {
                         />
                         <div className="flex-1">
                           <p className="font-medium">{op.product.name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-gray-500 text-sm">
                             Qty: {op.quantity}
                           </p>
                         </div>
@@ -131,9 +131,9 @@ export default function PurchasePage() {
                     ))}
                   </ul>
                   <Separator />
-                  <div className="flex items-center justify-between pt-2">
-                    <p className="text-lg font-semibold">Total Pesanan:</p>
-                    <p className="text-xl font-bold text-primary">
+                  <div className="flex justify-between items-center pt-2">
+                    <p className="font-semibold text-lg">Total Pesanan:</p>
+                    <p className="font-bold text-primary text-xl">
                       Rp{(order.total / 100).toLocaleString()}
                     </p>
                   </div>

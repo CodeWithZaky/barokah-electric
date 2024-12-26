@@ -32,16 +32,16 @@ export default function Home() {
         <meta name="description" content="Browse our wide range of products" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="container mx-auto flex flex-col gap-5 px-4 py-8">
+      <main className="flex flex-col gap-5 mx-auto py-8 container">
         <CarouselProduct />
-        <h1 className="mt-8 text-3xl font-bold">Our Products</h1>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        <h1 className="mt-8 font-bold text-3xl">Our Products</h1>
+        <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {products.data?.map((product) => (
             <Card
               key={product.id}
-              className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
+              className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden"
             >
-              <div className="relative h-48 w-full overflow-hidden">
+              <div className="relative w-full h-48 overflow-hidden">
                 <Image
                   src={
                     product.images[0]
@@ -54,14 +54,14 @@ export default function Home() {
                   className="transition-transform hover:scale-105"
                 />
               </div>
-              <div className="flex flex-1 flex-col justify-between p-4">
+              <div className="flex flex-col flex-1 justify-between p-4">
                 <div>
-                  <h2 className="mb-2 text-lg font-semibold">{product.name}</h2>
-                  <p className="text-xl font-bold text-green-700">
+                  <h2 className="mb-2 font-semibold text-lg">{product.name}</h2>
+                  <p className="font-bold text-green-700 text-xl">
                     Rp{product.price.toLocaleString("id-ID")}
                   </p>
                 </div>
-                <div className="mt-4 flex justify-between gap-2">
+                <div className="flex justify-between gap-2 mt-4">
                   <Button
                     variant="outline"
                     size="sm"
@@ -70,12 +70,12 @@ export default function Home() {
                       addItem.mutate({ productId: product.id, quantity: 1 })
                     }
                   >
-                    <LuShoppingCart className="mr-2 h-4 w-4" />
+                    <LuShoppingCart className="mr-2 w-4 h-4" />
                     Add to Cart
                   </Button>
                   <Button asChild size="sm" className="flex-1">
                     <Link href={`/checkout?id=${product.id}`}>
-                      <LuCreditCard className="mr-2 h-4 w-4" />
+                      <LuCreditCard className="mr-2 w-4 h-4" />
                       Buy Now
                     </Link>
                   </Button>

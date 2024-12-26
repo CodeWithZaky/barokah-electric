@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -9,16 +8,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
+import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
+import React from "react";
 
-export default function ProductList() {
+interface ProductListProps {
+  onEdit: (productId: number) => void;
+  onRefetchNeeded: (refetchFunction: () => void) => void;
+}
+
+export default function ProductList({
+  onEdit,
+  onRefetchNeeded,
+}: ProductListProps) {
   const { data: products, refetch } = api.product.getAll.useQuery();
-  const setProductId = useProductIdStore((state) => state.setProductId);
   const { toast } = useToast();
 
-  // DELETE PRODUCT
   const deleteProduct = api.product.delete.useMutation({
     onSuccess: () => {
       toast({
@@ -35,59 +41,61 @@ export default function ProductList() {
     }
   };
 
+  React.useEffect(() => {
+    onRefetchNeeded(refetch);
+  }, [onRefetchNeeded, refetch]);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Product List</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products?.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell>
-                  {product.images.map((image) => (
-                    <Image
-                      key={image.id}
-                      src={image.imageURL}
-                      alt={product.name}
-                      width={50}
-                      height={50}
-                    />
-                  ))}
-                </TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>
+    <div className="border rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Image</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Published</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {products?.map((product) => (
+            <TableRow key={product.id}>
+              <TableCell>
+                {product.images[0] && (
+                  <Image
+                    src={product.images[0].imageURL}
+                    alt={product.name}
+                    width={50}
+                    height={50}
+                    className="rounded-md"
+                  />
+                )}
+              </TableCell>
+              <TableCell className="font-medium">{product.name}</TableCell>
+              <TableCell>${product.price.toFixed(2)}</TableCell>
+              <TableCell>{product.published ? "Yes" : "No"}</TableCell>
+              <TableCell>
+                <div className="flex space-x-2">
                   <Button
                     variant="outline"
-                    size="sm"
-                    onClick={() => setProductId(product.id)}
-                    className="mr-2"
+                    size="icon"
+                    onClick={() => onEdit(product.id)}
                   >
-                    Edit
+                    <Edit size={16} />
                   </Button>
                   <Button
                     variant="destructive"
-                    size="sm"
+                    size="icon"
                     onClick={() => handleDelete(product.id)}
                   >
-                    Delete
+                    <Trash2 size={16} />
                   </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

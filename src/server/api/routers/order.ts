@@ -67,9 +67,21 @@ export const orderRouter = createTRPCRouter({
     const orders = await ctx.db.order.findMany({
       include: {
         orderProducts: {
-          include: { product: true },
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
+        Payment: {
+          select: {
+            paymentMethod: true,
+          },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
 
     return orders;

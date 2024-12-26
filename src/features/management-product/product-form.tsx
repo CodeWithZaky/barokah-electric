@@ -1,15 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import useProductIdStore from "@/stores/productId-store";
 import { api } from "@/utils/api";
 import { UploadButton } from "@/utils/uploadthing";
+import { X } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
@@ -26,7 +30,17 @@ const productSchema = z.object({
   ),
 });
 
-export default function ProductForm() {
+interface ProductFormProps {
+  productId: number | null;
+  onClose: () => void;
+  onProductCreated: () => void;
+}
+
+export default function ProductForm({
+  productId,
+  onClose,
+  onProductCreated,
+}: ProductFormProps) {
   const [formData, setFormData] = useState<z.infer<typeof productSchema>>({
     name: "",
     description: "",
@@ -35,8 +49,8 @@ export default function ProductForm() {
     published: true,
     images: [],
   });
+
   const { toast } = useToast();
-  const route = useRouter();
 
   const createProduct = api.product.create.useMutation({
     onSuccess: () => {
@@ -44,7 +58,8 @@ export default function ProductForm() {
         title: "Product created",
         description: "The product has been successfully created.",
       });
-      route.refresh();
+      onProductCreated();
+      onClose();
     },
   });
 
@@ -54,11 +69,9 @@ export default function ProductForm() {
         title: "Product updated",
         description: "The product has been successfully updated.",
       });
-      route.refresh();
+      onClose();
     },
   });
-
-  const productId = useProductIdStore((state) => state.productId);
 
   const { data: productById } = api.product.getById.useQuery(
     {
@@ -109,12 +122,21 @@ export default function ProductForm() {
     setFormData((prev) => ({ ...prev, published: checked }));
   };
 
+  const handleRemoveImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{productId ? "Edit Product" : "Create Product"}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            {productId ? "Edit Product" : "Create Product"}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Name</Label>
@@ -148,28 +170,31 @@ export default function ProductForm() {
               required
             />
           </div>
-          <div className="flex flex-col gap-5">
+          <div className="space-y-2">
             <Label htmlFor="images">Images</Label>
-            <div>
-              {formData.images.length <= 0 ? (
-                <div className="h-[200px] w-[200px] rounded-lg bg-gray-700/80" />
-              ) : (
-                formData.images.map((image, index) => (
-                  <div key={index}>
-                    <Image
-                      src={image.imageURL}
-                      alt="gambar"
-                      width={100}
-                      height={100}
-                    />
-                  </div>
-                ))
-              )}
+            <div className="flex flex-wrap gap-2">
+              {formData.images.map((image, index) => (
+                <div key={index} className="relative">
+                  <Image
+                    src={image.imageURL}
+                    alt="Product"
+                    width={100}
+                    height={100}
+                    className="rounded-md"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="-top-2 -right-2 absolute w-6 h-6"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    <X size={12} />
+                  </Button>
+                </div>
+              ))}
             </div>
             <UploadButton
-              appearance={{
-                button: "bg-foreground dark:text-background",
-              }}
               endpoint="imageUploader"
               onClientUploadComplete={(res) => {
                 if (res) {
@@ -183,7 +208,11 @@ export default function ProductForm() {
                 }
               }}
               onUploadError={(error: Error) => {
-                alert(`ERROR! ${error.message}`);
+                toast({
+                  title: "Upload Error",
+                  description: error.message,
+                  variant: "destructive",
+                });
               }}
             />
           </div>
@@ -195,11 +224,11 @@ export default function ProductForm() {
             />
             <Label htmlFor="published">Published</Label>
           </div>
-          <Button type="submit">
+          <Button type="submit" className="w-full">
             {productId ? "Update Product" : "Create Product"}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

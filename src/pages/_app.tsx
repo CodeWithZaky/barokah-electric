@@ -31,7 +31,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
               "min-h-screen w-full bg-muted-foreground/50",
             )}
           >
-            <div className="flexE w-ful mx-auto flex-col bg-background px-7">
+            <div className="flexE flex-col bg-background mx-auto w-ful">
               <Header />
               <Component {...pageProps} />
             </div>
