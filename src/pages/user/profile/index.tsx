@@ -1,5 +1,11 @@
+import UserLayout from "../layout";
+
 function ProfilePage() {
-  return <div>ProfilePage</div>;
+  return (
+    <UserLayout>
+      <div className="min-h-screen">ProfilePage</div>
+    </UserLayout>
+  );
 }
 
 export default ProfilePage;

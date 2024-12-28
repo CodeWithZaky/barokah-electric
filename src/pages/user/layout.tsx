@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserSession } from "@/types/user-session";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Bell,
   Coins,
@@ -9,26 +10,28 @@ import {
   Ticket,
   User,
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function UserLayout({
-  user,
   children,
 }: {
-  user?: UserSession;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-row">
-      <Sidebar user={user} />
+      <Sidebar />
       <div className="ml-auto w-[80%]">{children}</div>
     </div>
   );
 }
 
-const Sidebar = ({ user }: { user?: UserSession }) => {
+const Sidebar = () => {
+  const { data: session } = useSession();
   const router = useRouter();
+
+  const user = session?.user;
 
   const menuItems = [
     { icon: User, label: "Profil", href: "/user/profile" },
@@ -63,20 +66,30 @@ const Sidebar = ({ user }: { user?: UserSession }) => {
           </Link>
         </div>
       </div>
-      <div className="py-4">
+      <div className="flex flex-col gap-3 py-2">
         {menuItems.map((item, idx) => (
-          <ul key={idx} className="mb-4">
+          <ul key={idx}>
             <li key={idx}>
               <Link
                 href={item.href}
-                className={`flex items-center space-x-3 px-4 py-2 text-sm ${
+                className={`flex items-center space-x-3 px-4  text-sm ${
                   router.pathname === item.href
                     ? "text-foreground"
                     : "text-muted-foreground"
                 }`}
               >
-                <item.icon className="w-4 h-4" />
-                <span>{item.label}</span>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-2",
+                    router.pathname === item.href && "bg-muted",
+                  )}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Button>
+                {/* <item.icon className="w-4 h-4" />
+                <span>{item.label}</span> */}
               </Link>
             </li>
           </ul>

@@ -7,12 +7,12 @@ import { RecentSales } from "@/features/dashboard/recent-sales";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 import DashboardLayout from "./layout";
 
-export default function DashboardPage() {
+export default function OverviewDashboardPage() {
   return (
     <DashboardLayout>
       <div className="flex-1 space-y-4">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <div className="flex justify-between items-center space-y-2">
+          <h2 className="font-bold text-3xl tracking-tight">Dashboard</h2>
           <div className="flex items-center space-x-2">
             <CalendarDateRangePicker />
             <Button>Download</Button>
@@ -24,63 +24,63 @@ export default function DashboardPage() {
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-4">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+                  <CardTitle className="font-medium text-sm">
                     Total Revenue
                   </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <DollarSign className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="font-bold text-2xl">$45,231.89</div>
+                  <p className="text-muted-foreground text-xs">
                     +20.1% from last month
                   </p>
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+                  <CardTitle className="font-medium text-sm">
                     Subscriptions
                   </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Users className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="font-bold text-2xl">+2350</div>
+                  <p className="text-muted-foreground text-xs">
                     +180.1% from last month
                   </p>
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+                  <CardTitle className="font-medium text-sm">Sales</CardTitle>
+                  <CreditCard className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="font-bold text-2xl">+12,234</div>
+                  <p className="text-muted-foreground text-xs">
                     +19% from last month
                   </p>
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
+                  <CardTitle className="font-medium text-sm">
                     Active Now
                   </CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  <Activity className="w-4 h-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="font-bold text-2xl">+573</div>
+                  <p className="text-muted-foreground text-xs">
                     +201 since last hour
                   </p>
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
                   <CardTitle>Overview</CardTitle>

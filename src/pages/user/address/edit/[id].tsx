@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 export default function EditAddressPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: address, isLoading: isAddressLoading } =
@@ -79,7 +79,7 @@ export default function EditAddressPage() {
 
   if (isAddressLoading) {
     return (
-      <UserLayout user={session?.user}>
+      <UserLayout>
         <div className="flex-1 p-6">
           <div className="mx-auto max-w-2xl">Loading...</div>
         </div>
@@ -88,7 +88,7 @@ export default function EditAddressPage() {
   }
 
   return (
-    <UserLayout user={session?.user}>
+    <UserLayout>
       <div className="flex-1 p-6">
         <div className="shadow mx-auto rounded-lg max-w-2xl">
           <div className="p-6 border-b">

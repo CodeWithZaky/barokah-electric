@@ -54,10 +54,8 @@ export default function AddressPage() {
     return null;
   }
 
-  const usersession = session?.user;
-
   return (
-    <UserLayout user={session?.user}>
+    <UserLayout>
       <div className="flex-1 p-6">
         <div className="shadow mx-auto rounded-lg max-w-4xl">
           <div className="flex justify-between items-center p-6">

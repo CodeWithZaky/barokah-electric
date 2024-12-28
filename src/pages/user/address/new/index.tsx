@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function NewAddressPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const createAddress = api.address.creteAddress.useMutation({
@@ -58,7 +58,7 @@ export default function NewAddressPage() {
   }
 
   return (
-    <UserLayout user={session?.user}>
+    <UserLayout>
       <div className="flex-1 p-6">
         <div className="shadow mx-auto rounded-lg max-w-2xl">
           <div className="p-6 border-b">
