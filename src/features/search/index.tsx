@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { LuSearch } from "react-icons/lu";
 
 const FormSchema = z.object({
@@ -23,6 +23,8 @@ export default function Search() {
       searchProduct: "",
     },
   });
+
+  const { toast } = useToast();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({

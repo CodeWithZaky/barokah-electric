@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import UserLayout from "@/pages/user/layout";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
@@ -13,6 +13,8 @@ export default function EditAddressPage() {
   const { id } = router.query;
   const { status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+
+  const { toast } = useToast();
 
   const { data: address, isLoading: isAddressLoading } =
     api.address.getAddressById.useQuery({ id: Number(id) }, { enabled: !!id });

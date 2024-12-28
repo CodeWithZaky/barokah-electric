@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const userRoute = createTRPCRouter({
   register: publicProcedure
@@ -62,5 +62,67 @@ export const userRoute = createTRPCRouter({
             "An error occurred during registration. Please try again later.",
         });
       }
+    }),
+
+  // get user by id
+  getUserById: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const user = await ctx.db.user.findFirst({
+      select: {
+        accounts: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+                password: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+      where: { id: userId },
+    });
+    return user;
+  }),
+
+  // update user by id
+  updateUserById: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        image: z.string().url().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      return ctx.db.user.update({
+        where: { id: userId },
+        data: {
+          name: input.name,
+          email: input.email,
+          image: input.image,
+        },
+      });
+    }),
+
+  // update password by id
+  updatePasswordById: protectedProcedure
+    .input(
+      z.object({
+        password: z.string().min(8, "Password must be at least 8 characters"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const hashedPassword = await bcrypt.hash(input.password, 10);
+      return ctx.db.user.update({
+        where: { id: userId },
+        data: {
+          password: hashedPassword,
+        },
+      });
     }),
 });

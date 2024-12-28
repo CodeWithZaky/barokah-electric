@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import UserLayout from "@/pages/user/layout";
 import { api } from "@/utils/api";
 import { MapPin, Plus } from "lucide-react";
@@ -9,6 +9,8 @@ import { useRouter } from "next/router";
 export default function AddressPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+
+  const { toast } = useToast();
 
   const { data: address, isLoading } = api.address.getAddressByUserId.useQuery(
     undefined,
