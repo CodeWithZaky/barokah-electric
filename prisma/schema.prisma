@@ -7,12 +7,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-    USER
-    ADMIN
-}
-
-// User-related models
 model User {
     id            String    @id @default(cuid())
     name          String?
@@ -21,11 +15,12 @@ model User {
     password      String?
     image         String?
     role          UserRole  @default(USER)
-    accounts      Account[] // One-to-many relationship with Account
-    sessions      Session[] // One-to-many relationship with Session
-    product       Product[] // One-to-many relationship with Product
-    carts         Cart[] // One-to-many relationship with Cart
-    orders        Order[] // One-to-many relationship with Order
+    accounts      Account[]
+    address       Address[]
+    carts         Cart[]
+    orders        Order[]
+    product       Product[]
+    sessions      Session[]
 }
 
 model Account {
@@ -34,15 +29,15 @@ model Account {
     type                     String
     provider                 String
     providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
+    refresh_token            String?
+    access_token             String?
     expires_at               Int?
     token_type               String?
     scope                    String?
-    id_token                 String? // @db.Text
+    id_token                 String?
     session_state            String?
     refresh_token_expires_in Int?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade) // Many-to-one relationship with User
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -52,16 +47,29 @@ model Session {
     sessionToken String   @unique
     userId       String
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Many-to-one relationship with User
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Verification models
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Address {
+    id         Int    @id @default(autoincrement())
+    name       String
+    phone      String
+    email      String
+    address    String
+    postalCode String
+    city       String
+    province   String
+    country    String @default("Indonesia")
+    userId     String
+    user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -73,39 +81,94 @@ model Product {
     price         Float
     rate          Float
     published     Boolean        @default(false)
-    images        ProductImage[] // One-to-many relationship with ProductImage
     userId        String
-    user          User           @relation(fields: [userId], references: [id]) // Many-to-one relationship with User
-    cartItems     CartItem[] // One-to-many relationship with CartItem
+    cartItems     CartItem[]
     Order_product OrderProduct[]
+    user          User           @relation(fields: [userId], references: [id])
+    images        ProductImage[]
 }
 
 model ProductImage {
     id        Int      @id @default(autoincrement())
     imageURL  String
-    Product   Product? @relation(fields: [productId], references: [id]) // Many-to-one relationship with Product
     productId Int?
+    Product   Product? @relation(fields: [productId], references: [id])
 }
 
-// New Cart model
 model Cart {
     id        Int        @id @default(autoincrement())
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
     userId    String
-    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade) // Many-to-one relationship with User
-    items     CartItem[] // One-to-many relationship with CartItem
+    user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    items     CartItem[]
 }
 
-// New CartItem model
 model CartItem {
     id        Int     @id @default(autoincrement())
     quantity  Int
     productId Int
     cartId    Int
     checked   Boolean @default(false)
-    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // Many-to-one relationship with Product
-    cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade) // Many-to-one relationship with Cart
+    cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+    name           String
+    phone          String
+    email          String
+    address        String
+    postalCode     String
+    status         OrderStatus    @default(PENDING)
+    city           String
+    country        String         @default("Indonesia")
+    receipt        String?
+    total          Int
+    id             Int            @id @default(autoincrement())
+    userId         String
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    notes          String?
+    province       String
+    shippingMethod ShippingMethod @default(JNT)
+    user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    orderProducts  OrderProduct[]
+    Payment        Payment?
+}
+
+model OrderProduct {
+    productId Int
+    quantity  Int
+    id        Int     @id @default(autoincrement())
+    orderId   Int
+    order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+    id            Int           @id @default(autoincrement())
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    orderId       Int           @unique
+    status        PaymentStatus @default(PENDING)
+    transactionId String?
+    amount        Float         @default(0)
+    bank          String?
+    accountName   String?
+    accountNumber String?
+    dueDate       DateTime?
+    instructions  String?
+    isRefunded    Boolean       @default(false)
+    refundAmount  Float?
+    refundDate    DateTime?
+    paymentMethod PaymentMethod @default(COD)
+    order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+    USER
+    ADMIN
 }
 
 enum OrderStatus {
@@ -130,38 +193,6 @@ enum ShippingMethod {
     TIKI
 }
 
-model Order {
-    id             Int            @id @default(autoincrement())
-    name           String
-    phone          String
-    email          String
-    adress         String
-    postalCode     String
-    createdAt      DateTime       @default(now())
-    updatedAt      DateTime       @updatedAt
-    city           String
-    province       String
-    country        String         @default("Indonesia")
-    notes          String?
-    receipt        String?
-    total          Int
-    status         OrderStatus    @default(PENDING)
-    shippingMethod ShippingMethod @default(JNT)
-    orderProducts  OrderProduct[]
-    Payment        Payment?
-    userId         String
-    user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model OrderProduct {
-    id        Int     @id @default(autoincrement())
-    orderId   Int
-    productId Int
-    quantity  Int
-    order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-}
-
 enum PaymentStatus {
     PENDING
     COMPLETED
@@ -173,24 +204,4 @@ enum PaymentStatus {
 enum PaymentMethod {
     COD
     BANK_TRANSFER
-}
-
-model Payment {
-    id            Int           @id @default(autoincrement())
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
-    orderId       Int           @unique
-    order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-    paymentMethod PaymentMethod @default(COD) // Payment method (e.g., Virtual Account, Bank Transfer)
-    status        PaymentStatus @default(PENDING) // Payment status (e.g., Pending, Completed, Failed)
-    transactionId String? // Optional field for storing transaction ID
-    amount        Float         @default(0) // Payment amount
-    bank          String? // Bank name
-    accountName   String? // Account holder name
-    accountNumber String? // Virtual account or bank account number
-    dueDate       DateTime? // Payment deadline
-    instructions  String? // Optional field for special instructions
-    isRefunded    Boolean       @default(false)
-    refundAmount  Float? // Jumlah refund
-    refundDate    DateTime? // Tanggal refund
 }

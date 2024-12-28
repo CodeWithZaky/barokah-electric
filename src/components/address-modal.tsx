@@ -27,7 +27,7 @@ const addressFormSchema = z.object({
     .string()
     .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
   email: z.string().email({ message: "Alamat email tidak valid." }),
-  adress: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
+  address: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
   city: z.string().min(2, { message: "Kota harus minimal 2 karakter." }),
   postalCode: z
     .string()
@@ -108,7 +108,7 @@ export function AddressModal({
             />
             <FormField
               control={form.control}
-              name="adress"
+              name="address"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Alamat</FormLabel>

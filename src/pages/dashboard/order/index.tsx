@@ -58,41 +58,41 @@ export default function OrderDashboard() {
 
   if (isLoading)
     return (
-      <div className="flex justify-center items-center w-full min-h-screen text-5xl animate-pulse">
+      <div className="flex min-h-screen w-full animate-pulse items-center justify-center text-5xl">
         Loading...
       </div>
     );
 
   const statusIcons = {
-    PENDING: <Clock className="w-5 h-5" />,
-    PROCESSING: <Package className="w-5 h-5" />,
-    PACKED: <Box className="w-5 h-5" />,
-    SHIPPED: <Truck className="w-5 h-5" />,
-    DELIVERED: <ShoppingBag className="w-5 h-5" />,
-    COMPLETED: <CheckCircle className="w-5 h-5" />,
-    CANCELLED: <XCircle className="w-5 h-5" />,
+    PENDING: <Clock className="h-5 w-5" />,
+    PROCESSING: <Package className="h-5 w-5" />,
+    PACKED: <Box className="h-5 w-5" />,
+    SHIPPED: <Truck className="h-5 w-5" />,
+    DELIVERED: <ShoppingBag className="h-5 w-5" />,
+    COMPLETED: <CheckCircle className="h-5 w-5" />,
+    CANCELLED: <XCircle className="h-5 w-5" />,
   };
 
   return (
     <DashboardLayout>
-      <div className="mx-auto p-4 min-h-screen container">
-        <h1 className="mb-6 font-bold text-3xl text-center text-primary">
+      <div className="container mx-auto min-h-screen p-4">
+        <h1 className="mb-6 text-center text-3xl font-bold text-primary">
           Pesanan
         </h1>
         <Tabs
           defaultValue="PENDING"
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
-          className="shadow-lg rounded-lg"
+          className="rounded-lg shadow-lg"
         >
-          <TabsList className="gap-2 grid grid-cols-7 w-full">
+          <TabsList className="grid w-full grid-cols-7 gap-2">
             {Object.entries(statusIcons).map(([status, icon]) => (
               <TabsTrigger
                 key={status}
                 value={status}
-                className="flex justify-center items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 {icon}
-                <span className="sm:inline hidden">{status}</span>
+                <span className="hidden sm:inline">{status}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -101,10 +101,10 @@ export default function OrderDashboard() {
               {filteredOrders?.map((order) => (
                 <Card
                   key={order.id}
-                  className="hover:shadow-xl mb-6 transition-shadow duration-300 overflow-hidden"
+                  className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
                 >
                   <CardHeader className="bg-primary/5">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <CardTitle className="text-lg sm:text-xl">
                         Order #{order.id}
                       </CardTitle>
@@ -117,11 +117,11 @@ export default function OrderDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6 pt-4">
-                    <div className="flex sm:flex-row flex-col sm:items-start gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                       <div className="flex-1">
                         <h3 className="mb-2 font-semibold">Alamat Tujuan:</h3>
                         <p className="text-sm">{order.name}</p>
-                        <p className="text-sm">{order.adress}</p>
+                        <p className="text-sm">{order.address}</p>
                         <p className="text-sm">
                           {order.city}, {order.province}, ID, {order.postalCode}
                         </p>
@@ -151,21 +151,23 @@ export default function OrderDashboard() {
                           />
                           <div className="flex-1">
                             <p className="font-medium">{op.product.name}</p>
-                            <p className="text-gray-500 text-sm">
+                            <p className="text-sm text-gray-500">
                               Qty: {op.quantity}
                             </p>
                           </div>
                           <p className="font-semibold">
-                            Rp{op.product.price.toLocaleString()}
+                            Rp
+                            {op.product.price.toLocaleString()}
                           </p>
                         </li>
                       ))}
                     </ul>
                     <Separator />
-                    <div className="flex justify-between items-center pt-2">
-                      <p className="font-semibold text-lg">Total Pesanan:</p>
-                      <p className="font-bold text-primary text-xl">
-                        Rp{(order.total / 100).toLocaleString()}
+                    <div className="flex items-center justify-between pt-2">
+                      <p className="text-lg font-semibold">Total Pesanan:</p>
+                      <p className="text-xl font-bold text-primary">
+                        Rp
+                        {(order.total / 100).toLocaleString()}
                       </p>
                     </div>
                   </CardContent>

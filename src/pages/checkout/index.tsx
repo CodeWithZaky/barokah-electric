@@ -49,7 +49,7 @@ const formSchema = z.object({
     .string()
     .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
   email: z.string().email({ message: "Alamat email tidak valid." }),
-  adress: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
+  address: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
   postalCode: z
     .string()
     .min(5, { message: "Kode pos harus minimal 5 karakter." }),
@@ -69,7 +69,7 @@ const addressFormSchema = z.object({
     .string()
     .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
   email: z.string().email({ message: "Alamat email tidak valid." }),
-  adress: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
+  address: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
   postalCode: z
     .string()
     .min(5, { message: "Kode pos harus minimal 5 karakter." }),
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
       name: "",
       phone: "",
       email: "",
-      adress: "",
+      address: "",
       postalCode: "",
       city: "",
       province: "",
@@ -199,7 +199,7 @@ export default function CheckoutPage() {
             {form.watch("phone") || "Nomor Telepon"}
           </p>
           <p className="text-muted-foreground">
-            {form.watch("adress") || "Alamat Lengkap"}
+            {form.watch("address") || "Alamat Lengkap"}
           </p>
         </div>
       </div>
