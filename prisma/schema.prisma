@@ -59,7 +59,7 @@ model VerificationToken {
 }
 
 model Address {
-    id         Int    @id @default(autoincrement())
+    id         Int     @id @default(autoincrement())
     name       String
     phone      String
     email      String
@@ -67,9 +67,10 @@ model Address {
     postalCode String
     city       String
     province   String
-    country    String @default("Indonesia")
+    isPrimary  Boolean @default(false)
+    country    String  @default("Indonesia")
     userId     String
-    user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {

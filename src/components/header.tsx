@@ -21,8 +21,6 @@ const Header = () => {
 
   const pathname = usePathname();
 
-  console.log("pathname", pathname);
-
   // if (pathname.startsWith("/dashboard")) {
   //   return null;
   // }
@@ -94,10 +92,10 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuItem asChild>
-                  <Link href="/user/profile">Profile</Link>
+                  <Link href="/user/account">Account</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/user/purchase">Orders</Link>
+                  <Link href="/user/orders">Orders</Link>
                 </DropdownMenuItem>
                 {session?.user?.role === "ADMIN" && (
                   <DropdownMenuItem asChild>

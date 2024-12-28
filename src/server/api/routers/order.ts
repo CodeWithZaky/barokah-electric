@@ -11,7 +11,7 @@ export const orderRouter = createTRPCRouter({
         name: z.string(),
         phone: z.string(),
         email: z.string(),
-        adress: z.string(),
+        address: z.string(),
         postalCode: z.string(),
         city: z.string(),
         province: z.string(),

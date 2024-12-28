@@ -37,8 +37,6 @@ export default function Cart() {
     clearSelection,
   } = useSelectedItemStore();
 
-  console.log(selectedItems);
-
   const {
     data: cart,
     refetch: refetchCart,
@@ -102,14 +100,14 @@ export default function Cart() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 min-h-screen items-center justify-center">
-        <LuLoader2 className="h-8 w-8 animate-spin" />
+      <div className="flex justify-center items-center h-64 min-h-screen">
+        <LuLoader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <Card className="mx-auto min-h-screen w-full max-w-4xl bg-background">
+    <Card className="bg-background mx-auto w-full max-w-4xl min-h-screen">
       <CardHeader className="border-b">
         <CardTitle>Keranjang Belanja</CardTitle>
       </CardHeader>
@@ -118,7 +116,7 @@ export default function Cart() {
           <p>Keranjang belanja kamu kosong.</p>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-[auto,2fr,1fr,1fr,auto] items-center gap-4 px-4 text-sm text-muted-foreground">
+            <div className="items-center gap-4 grid grid-cols-[auto,2fr,1fr,1fr,auto] px-4 text-muted-foreground text-sm">
               <div className="flex items-center space-x-4">
                 <Checkbox
                   checked={selectedItems.length === cart?.items.length}
@@ -138,14 +136,14 @@ export default function Cart() {
               {cart?.items.map((item) => (
                 <li
                   key={item.id}
-                  className="grid grid-cols-[auto,2fr,1fr,1fr,auto] items-center gap-4 px-4"
+                  className="items-center gap-4 grid grid-cols-[auto,2fr,1fr,1fr,auto] px-4"
                 >
                   <div className="flex items-center space-x-4">
                     <Checkbox
                       checked={selectedItems.includes(item.id)}
                       onCheckedChange={() => handleSelectItem(item.id)}
                     />
-                    <div className="h-16 w-16 overflow-hidden rounded border">
+                    <div className="border rounded w-16 h-16 overflow-hidden">
                       <Image
                         src={
                           item.product.images[0]?.imageURL || "/placeholder.svg"
@@ -153,7 +151,7 @@ export default function Cart() {
                         alt={item.product.name}
                         width={64}
                         height={64}
-                        className="h-full w-full object-cover"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
@@ -161,11 +159,11 @@ export default function Cart() {
                   <span className="text-center">
                     Rp{item.product.price.toLocaleString()}
                   </span>
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex justify-center items-center space-x-2">
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8"
+                      className="w-8 h-8"
                       onClick={() =>
                         handleUpdateQuantity(item, item.quantity - 1)
                       }
@@ -178,12 +176,12 @@ export default function Cart() {
                       onChange={(e) =>
                         handleUpdateQuantity(item, parseInt(e.target.value))
                       }
-                      className="h-8 w-16 text-center"
+                      className="w-16 h-8 text-center"
                     />
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-8 w-8"
+                      className="w-8 h-8"
                       onClick={() =>
                         handleUpdateQuantity(item, item.quantity + 1)
                       }
@@ -198,10 +196,10 @@ export default function Cart() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-destructive"
+                      className="w-8 h-8 text-destructive"
                       onClick={() => handleRemoveItem(item)}
                     >
-                      <LuTrash2 className="h-4 w-4" />
+                      <LuTrash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </li>
@@ -210,8 +208,8 @@ export default function Cart() {
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t p-6">
-        <div className="flex w-full items-center justify-between">
+      <CardFooter className="p-6 border-t">
+        <div className="flex justify-between items-center w-full">
           <div className="flex items-center space-x-4">
             <Checkbox
               checked={selectedItems.length === cart?.items.length}
@@ -229,10 +227,10 @@ export default function Cart() {
           </div>
           <div className="flex items-center space-x-6">
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Total ({selectedItems.length} produk):
               </p>
-              <p className="text-lg font-semibold text-primary">
+              <p className="font-semibold text-lg text-primary">
                 Rp{totalPrice.toLocaleString()}
               </p>
             </div>
