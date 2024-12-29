@@ -13,12 +13,13 @@ export default function AddressPage() {
 
   const { toast } = useToast();
 
-  const { data: address, isLoading } = api.address.getAddressByUserId.useQuery(
-    undefined,
-    {
-      enabled: !!session,
-    },
-  );
+  const {
+    data: address,
+    isLoading,
+    refetch,
+  } = api.address.getAddressByUserId.useQuery(undefined, {
+    enabled: !!session,
+  });
 
   const setPrimaryAddress = api.address.setPrimaryAddress.useMutation({
     onSuccess: () => {
@@ -32,6 +33,7 @@ export default function AddressPage() {
   const handleSetPrimary = async (id: number) => {
     if (address) {
       await setPrimaryAddress.mutateAsync({ id });
+      await refetch();
     }
   };
 
