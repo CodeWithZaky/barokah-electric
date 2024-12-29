@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
-import { Package } from "lucide-react";
+import { Zap } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { LuSearch, LuShoppingCart } from "react-icons/lu";
@@ -24,7 +24,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link className="flex items-center gap-2 font-semibold" href="/">
-          <Package className="h-6 w-6" />
+          <Zap className="h-6 w-6" />
           <span>BarokahElectric</span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">

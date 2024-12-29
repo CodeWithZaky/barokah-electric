@@ -7,6 +7,7 @@ import {
   CreditCard,
   MapPin,
   Settings,
+  ShoppingBag,
   Ticket,
   User,
 } from "lucide-react";
@@ -35,24 +36,24 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: User, label: "Profil", href: "/user/profile" },
-    { icon: CreditCard, label: "Bank & Kartu", href: "/user/payment" },
+    { icon: ShoppingBag, label: "Pesanan Saya", href: "/user/orders" },
     { icon: MapPin, label: "Alamat", href: "/user/address" },
+    { icon: CreditCard, label: "Bank & Kartu", href: "/user/payment" },
     {
       icon: Settings,
       label: "Pengaturan Notifikasi",
       href: "/user/notifications/settings",
     },
     { icon: Settings, label: "Pengaturan Privasi", href: "/user/privacy" },
-    { icon: Bell, label: "Pesanan Saya", href: "/user/orders" },
     { icon: Bell, label: "Notifikasi", href: "/user/notifications" },
     { icon: Ticket, label: "Voucher Saya", href: "/user/vouchers" },
-    { icon: Coins, label: "Koin Shopee Saya", href: "/user/coins" },
+    { icon: Coins, label: "Koin Saya", href: "/user/coins" },
   ];
 
   return (
-    <div className="fixed border-r w-[20%] h-screen">
-      <div className="flex items-center space-x-3 p-4 border-b">
-        <Avatar className="w-12 h-12">
+    <div className="fixed h-screen w-[20%] border-r">
+      <div className="flex items-center space-x-3 border-b p-4">
+        <Avatar className="h-12 w-12">
           <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
           <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
         </Avatar>
@@ -60,7 +61,7 @@ const Sidebar = () => {
           <h3 className="font-medium">{user?.name}</h3>
           <Link
             href="/user/profile"
-            className="text-foreground text-sm hover:text-primary"
+            className="text-sm text-foreground hover:text-primary"
           >
             Ubah Profil
           </Link>
@@ -85,7 +86,7 @@ const Sidebar = () => {
                     router.pathname === item.href && "bg-muted",
                   )}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className="h-4 w-4" />
                   {item.label}
                 </Button>
                 {/* <item.icon className="w-4 h-4" />
