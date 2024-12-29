@@ -11,38 +11,33 @@ import { api } from "@/utils/api";
 import { Package } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { LuSearch, LuShoppingCart } from "react-icons/lu";
 import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
   const { data: session, status } = useSession();
-  const { data: cartCount, refetch } = api.cart.getCartCount.useQuery();
-
-  const pathname = usePathname();
-
-  // if (pathname.startsWith("/dashboard")) {
-  //   return null;
-  // }
+  const { data: cartCount } = api.cart.getCartCount.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
 
   return (
-    <header className="top-0 z-50 sticky bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 border-b w-full">
-      <div className="flex items-center h-16 container">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
         <Link className="flex items-center gap-2 font-semibold" href="/">
-          <Package className="w-6 h-6" />
+          <Package className="h-6 w-6" />
           <span>BarokahElectric</span>
         </Link>
-        <div className="flex flex-1 justify-end items-center space-x-4">
-          <div className="md:flex items-center w-full max-w-sm">
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <div className="w-full max-w-sm items-center md:flex">
             <form className="relative">
               <LuSearch
-                className="top-2.5 left-2.5 absolute w-4 h-4 text-muted-foreground"
+                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
                 aria-hidden="true"
               />
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="bg-transparent pl-8 w-full md:w-[300px] lg:w-[300px] appearance-none"
+                className="w-full appearance-none bg-transparent pl-8 md:w-[300px] lg:w-[300px]"
               />
             </form>
           </div>
@@ -54,9 +49,9 @@ const Header = () => {
             aria-label="Shopping Cart"
           >
             <Link href="/cart" className="relative">
-              <LuShoppingCart className="w-6 h-6" />
-              <span className="-top-2 -right-2 absolute flex justify-center items-center bg-primary rounded-full w-5 h-5 text-primary-foreground text-xs">
-                {cartCount}
+              <LuShoppingCart className="h-6 w-6" />
+              <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                {cartCount ? cartCount : 0}
               </span>
               <span className="sr-only">Shopping Cart</span>
             </Link>
@@ -75,9 +70,9 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative rounded-full w-8 h-8"
+                  className="relative h-8 w-8 rounded-full"
                 >
-                  <Avatar className="w-8 h-8">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={
                         session?.user?.image ?? "https://github.com/shadcn.png"

@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   // console.log("pathname===>", request.nextUrl.pathname);
 
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
   // Check the role and redirect based on the role
 

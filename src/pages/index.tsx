@@ -3,17 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { LuCreditCard, LuShoppingCart } from "react-icons/lu";
 
 export default function Home() {
-  const products = api.product.getAll.useQuery();
+  const { status } = useSession();
+
+  const { data: products, status: productStatus } =
+    api.product.getAll.useQuery();
 
   const { toast } = useToast();
 
-  const { refetch: refetchCart } = api.cart.getCart.useQuery();
+  const { refetch: refetchCart } = api.cart.getCart.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
 
   const addItem = api.cart.addItem.useMutation({
     onSuccess: () => {
@@ -24,6 +30,10 @@ export default function Home() {
       });
     },
   });
+
+  if (productStatus === "pending") {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -36,7 +46,7 @@ export default function Home() {
         <CarouselProduct />
         <h1 className="mt-8 text-3xl font-bold">Our Products</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-          {products.data?.map((product) => (
+          {products?.map((product) => (
             <Card
               key={product.id}
               className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
