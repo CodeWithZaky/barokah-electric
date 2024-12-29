@@ -10,6 +10,7 @@ import { LuFileEdit, LuMapPin } from "react-icons/lu";
 import * as z from "zod";
 
 import { AddressModal } from "@/components/address-modal";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -169,15 +170,15 @@ export default function CheckoutPage() {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
-    <div className="space-y-4 mx-auto p-4 max-w-4xl min-h-screen">
-      <div className="shadow-sm p-4 rounded-lg">
-        <div className="flex justify-between items-center mb-4 pb-4 border-b">
+    <div className="mx-auto min-h-screen max-w-4xl space-y-4 p-4">
+      <div className="rounded-lg p-4 shadow-sm">
+        <div className="mb-4 flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-2">
-            <LuMapPin className="w-5 h-5 text-primary" />
+            <LuMapPin className="h-5 w-5 text-primary" />
             <span className="font-medium">Alamat Pengiriman</span>
           </div>
           <Button
@@ -186,7 +187,7 @@ export default function CheckoutPage() {
             className="text-primary"
             onClick={() => setIsAddressModalOpen(true)}
           >
-            <LuFileEdit className="mr-2 w-4 h-4" />
+            <LuFileEdit className="mr-2 h-4 w-4" />
             Ubah
           </Button>
         </div>
@@ -201,8 +202,8 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="shadow-sm rounded-lg">
-        <div className="gap-4 grid grid-cols-[2fr,1fr,1fr,1fr] p-4 border-b text-muted-foreground text-sm">
+      <div className="rounded-lg shadow-sm">
+        <div className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 border-b p-4 text-sm text-muted-foreground">
           <div>Produk</div>
           <div className="text-center">Harga Satuan</div>
           <div className="text-center">Kuantitas</div>
@@ -212,16 +213,16 @@ export default function CheckoutPage() {
           {carts?.map((item) => (
             <div
               key={item.id}
-              className="gap-4 grid grid-cols-[2fr,1fr,1fr,1fr] p-4"
+              className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 p-4"
             >
               <div className="flex gap-4">
-                <div className="border rounded w-16 h-16 overflow-hidden">
+                <div className="h-16 w-16 overflow-hidden rounded border">
                   <Image
                     src={item.product.images[0]?.imageURL || "/placeholder.svg"}
                     alt={item.product.name}
                     width={64}
                     height={64}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div>
@@ -232,13 +233,13 @@ export default function CheckoutPage() {
                 Rp{item.product.price.toLocaleString()}
               </div>
               <div className="text-center">{item.quantity}</div>
-              <div className="font-medium text-center">
+              <div className="text-center font-medium">
                 Rp{(item.quantity * item.product.price).toLocaleString()}
               </div>
             </div>
           ))}
         </div>
-        <div className="p-4 border-t">
+        <div className="border-t p-4">
           <div className="flex items-center gap-2">
             <Input
               placeholder="Pesan untuk penjual..."
@@ -249,7 +250,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="shadow-sm p-4 rounded-lg">
+      <div className="rounded-lg p-4 shadow-sm">
         <div className="mb-4 font-medium">Metode Pengiriman</div>
         <Form {...form}>
           <FormField
@@ -266,7 +267,7 @@ export default function CheckoutPage() {
                     {Object.entries(shippingCosts).map(([method, cost]) => (
                       <div
                         key={method}
-                        className="flex justify-between items-center p-4 border rounded-lg"
+                        className="flex items-center justify-between rounded-lg border p-4"
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value={method} id={method} />
@@ -284,7 +285,7 @@ export default function CheckoutPage() {
         </Form>
       </div>
 
-      <div className="shadow-sm p-4 rounded-lg">
+      <div className="rounded-lg p-4 shadow-sm">
         <div className="mb-4 font-medium">Metode Pembayaran</div>
         <Form {...form}>
           <div className="space-y-4">
@@ -304,11 +305,11 @@ export default function CheckoutPage() {
                       defaultValue={field.value}
                       className="space-y-2"
                     >
-                      <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                      <div className="flex items-center space-x-2 rounded-lg border p-4">
                         <RadioGroupItem value={PaymentMethod.COD} id="cod" />
                         <Label htmlFor="cod">Bayar di Tempat (COD)</Label>
                       </div>
-                      <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                      <div className="flex items-center space-x-2 rounded-lg border p-4">
                         <RadioGroupItem
                           value={PaymentMethod.BANK_TRANSFER}
                           id="bank"
@@ -337,7 +338,7 @@ export default function CheckoutPage() {
                         {Object.values(BankType).map((bank) => (
                           <div
                             key={bank}
-                            className="flex items-center space-x-2 p-4 border rounded-lg"
+                            className="flex items-center space-x-2 rounded-lg border p-4"
                           >
                             <RadioGroupItem
                               value={bank}
@@ -359,7 +360,7 @@ export default function CheckoutPage() {
         </Form>
       </div>
 
-      <div className="shadow-sm p-4 rounded-lg">
+      <div className="rounded-lg p-4 shadow-sm">
         <div className="mb-4 font-medium">Voucher</div>
         <div className="flex gap-2">
           <Input placeholder="Masukkan kode voucher" />
@@ -367,18 +368,18 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="bottom-0 sticky shadow-sm backdrop-blur-md p-4 rounded-lg">
-        <div className="flex justify-between items-center">
+      <div className="sticky bottom-0 rounded-lg p-4 shadow-sm backdrop-blur-md">
+        <div className="flex items-center justify-between">
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
-              <span className="text-muted-foreground text-sm">
+              <span className="text-sm text-muted-foreground">
                 Total Pesanan ({carts?.length || 0} Produk):
               </span>
-              <span className="font-bold text-2xl text-primary">
+              <span className="text-2xl font-bold text-primary">
                 Rp{total.toLocaleString()}
               </span>
             </div>
-            <div className="text-muted-foreground text-xs">
+            <div className="text-xs text-muted-foreground">
               Total Produk: Rp{subtotal.toLocaleString()}
               <br />
               Total Ongkos Kirim: Rp

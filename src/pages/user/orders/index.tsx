@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -29,43 +30,38 @@ export default function OrdersPage() {
 
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="border-primary border-t-2 border-b-2 rounded-full w-32 h-32 animate-spin"></div>
-      </div>
-    );
+  if (isLoading) return <Loading />;
 
   const statusIcons = {
-    PENDING: <Clock className="w-5 h-5" />,
-    PROCESSING: <Package className="w-5 h-5" />,
-    PACKED: <Box className="w-5 h-5" />,
-    SHIPPED: <Truck className="w-5 h-5" />,
-    DELIVERED: <ShoppingBag className="w-5 h-5" />,
-    COMPLETED: <CheckCircle className="w-5 h-5" />,
-    CANCELLED: <XCircle className="w-5 h-5" />,
+    PENDING: <Clock className="h-5 w-5" />,
+    PROCESSING: <Package className="h-5 w-5" />,
+    PACKED: <Box className="h-5 w-5" />,
+    SHIPPED: <Truck className="h-5 w-5" />,
+    DELIVERED: <ShoppingBag className="h-5 w-5" />,
+    COMPLETED: <CheckCircle className="h-5 w-5" />,
+    CANCELLED: <XCircle className="h-5 w-5" />,
   };
 
   return (
     <UserLayout>
-      <div className="p-4 min-h-screen">
-        <h1 className="mb-6 font-bold text-3xl text-center text-primary">
+      <div className="min-h-screen p-4">
+        <h1 className="mb-6 text-center text-3xl font-bold text-primary">
           Pesanan Saya
         </h1>
         <Tabs
           defaultValue="PENDING"
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
-          className="shadow-lg rounded-lg"
+          className="rounded-lg shadow-lg"
         >
-          <TabsList className="gap-2 grid grid-cols-7 w-full">
+          <TabsList className="grid w-full grid-cols-7 gap-2">
             {Object.entries(statusIcons).map(([status, icon]) => (
               <TabsTrigger
                 key={status}
                 value={status}
-                className="flex justify-center items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 {icon}
-                <span className="sm:inline hidden">{status}</span>
+                <span className="hidden sm:inline">{status}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -74,10 +70,10 @@ export default function OrdersPage() {
               {filteredOrders?.map((order) => (
                 <Card
                   key={order.id}
-                  className="hover:shadow-xl mb-6 transition-shadow duration-300 overflow-hidden"
+                  className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
                 >
                   <CardHeader className="bg-primary/5">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <CardTitle className="text-lg sm:text-xl">
                         Order #{order.id}
                       </CardTitle>
@@ -90,7 +86,7 @@ export default function OrdersPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6 pt-4">
-                    <div className="flex sm:flex-row flex-col sm:items-start gap-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                       <div className="flex-1">
                         <h3 className="mb-2 font-semibold">Alamat Tujuan:</h3>
                         <p className="text-sm">{order.name}</p>
@@ -124,7 +120,7 @@ export default function OrdersPage() {
                           />
                           <div className="flex-1">
                             <p className="font-medium">{op.product.name}</p>
-                            <p className="text-gray-500 text-sm">
+                            <p className="text-sm text-gray-500">
                               Qty: {op.quantity}
                             </p>
                           </div>
@@ -135,9 +131,9 @@ export default function OrdersPage() {
                       ))}
                     </ul>
                     <Separator />
-                    <div className="flex justify-between items-center pt-2">
-                      <p className="font-semibold text-lg">Total Pesanan:</p>
-                      <p className="font-bold text-primary text-xl">
+                    <div className="flex items-center justify-between pt-2">
+                      <p className="text-lg font-semibold">Total Pesanan:</p>
+                      <p className="text-xl font-bold text-primary">
                         Rp{(order.total / 100).toLocaleString()}
                       </p>
                     </div>

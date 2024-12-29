@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +16,7 @@ import useSelectedItemStore from "@/stores/selected-cart-item-id";
 import { api } from "@/utils/api";
 import Image from "next/image";
 import Link from "next/link";
-import { LuLoader2, LuTrash2 } from "react-icons/lu";
+import { LuTrash2 } from "react-icons/lu";
 
 type CartItem = {
   id: number;
@@ -99,15 +100,11 @@ export default function Cart() {
     0;
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 min-h-screen">
-        <LuLoader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
-    <Card className="bg-background mx-auto w-full max-w-4xl min-h-screen">
+    <Card className="mx-auto min-h-screen w-full max-w-4xl bg-background">
       <CardHeader className="border-b">
         <CardTitle>Keranjang Belanja</CardTitle>
       </CardHeader>
@@ -116,7 +113,7 @@ export default function Cart() {
           <p>Keranjang belanja kamu kosong.</p>
         ) : (
           <div className="space-y-4">
-            <div className="items-center gap-4 grid grid-cols-[auto,2fr,1fr,1fr,auto] px-4 text-muted-foreground text-sm">
+            <div className="grid grid-cols-[auto,2fr,1fr,1fr,auto] items-center gap-4 px-4 text-sm text-muted-foreground">
               <div className="flex items-center space-x-4">
                 <Checkbox
                   checked={selectedItems.length === cart?.items.length}
@@ -136,14 +133,14 @@ export default function Cart() {
               {cart?.items.map((item) => (
                 <li
                   key={item.id}
-                  className="items-center gap-4 grid grid-cols-[auto,2fr,1fr,1fr,auto] px-4"
+                  className="grid grid-cols-[auto,2fr,1fr,1fr,auto] items-center gap-4 px-4"
                 >
                   <div className="flex items-center space-x-4">
                     <Checkbox
                       checked={selectedItems.includes(item.id)}
                       onCheckedChange={() => handleSelectItem(item.id)}
                     />
-                    <div className="border rounded w-16 h-16 overflow-hidden">
+                    <div className="h-16 w-16 overflow-hidden rounded border">
                       <Image
                         src={
                           item.product.images[0]?.imageURL || "/placeholder.svg"
@@ -151,7 +148,7 @@ export default function Cart() {
                         alt={item.product.name}
                         width={64}
                         height={64}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
                       />
                     </div>
                   </div>
@@ -159,11 +156,11 @@ export default function Cart() {
                   <span className="text-center">
                     Rp{item.product.price.toLocaleString()}
                   </span>
-                  <div className="flex justify-center items-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2">
                     <Button
                       variant="outline"
                       size="icon"
-                      className="w-8 h-8"
+                      className="h-8 w-8"
                       onClick={() =>
                         handleUpdateQuantity(item, item.quantity - 1)
                       }
@@ -176,12 +173,12 @@ export default function Cart() {
                       onChange={(e) =>
                         handleUpdateQuantity(item, parseInt(e.target.value))
                       }
-                      className="w-16 h-8 text-center"
+                      className="h-8 w-16 text-center"
                     />
                     <Button
                       variant="outline"
                       size="icon"
-                      className="w-8 h-8"
+                      className="h-8 w-8"
                       onClick={() =>
                         handleUpdateQuantity(item, item.quantity + 1)
                       }
@@ -196,10 +193,10 @@ export default function Cart() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="w-8 h-8 text-destructive"
+                      className="h-8 w-8 text-destructive"
                       onClick={() => handleRemoveItem(item)}
                     >
-                      <LuTrash2 className="w-4 h-4" />
+                      <LuTrash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </li>
@@ -208,8 +205,8 @@ export default function Cart() {
           </div>
         )}
       </CardContent>
-      <CardFooter className="p-6 border-t">
-        <div className="flex justify-between items-center w-full">
+      <CardFooter className="border-t p-6">
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-4">
             <Checkbox
               checked={selectedItems.length === cart?.items.length}
@@ -227,10 +224,10 @@ export default function Cart() {
           </div>
           <div className="flex items-center space-x-6">
             <div className="text-right">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Total ({selectedItems.length} produk):
               </p>
-              <p className="font-semibold text-lg text-primary">
+              <p className="text-lg font-semibold text-primary">
                 Rp{totalPrice.toLocaleString()}
               </p>
             </div>

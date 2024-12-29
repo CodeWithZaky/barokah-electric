@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import UserLayout from "@/pages/user/layout";
@@ -59,26 +60,26 @@ export default function AddressPage() {
   return (
     <UserLayout>
       <div className="flex-1 p-6">
-        <div className="shadow mx-auto rounded-lg max-w-4xl">
-          <div className="flex justify-between items-center p-6">
-            <h1 className="font-medium text-xl">Alamat Saya</h1>
+        <div className="mx-auto max-w-4xl rounded-lg shadow">
+          <div className="flex items-center justify-between p-6">
+            <h1 className="text-xl font-medium">Alamat Saya</h1>
             <Button
               onClick={() => router.push("/user/address/new")}
               className="bg-primary hover:bg-primary/90"
             >
-              <Plus className="mr-2 w-4 h-4" />
+              <Plus className="mr-2 h-4 w-4" />
               Tambah Alamat Baru
             </Button>
           </div>
 
           {isLoading ? (
-            <div className="p-6">Loading...</div>
+            <Loading />
           ) : address ? (
             <div>
               {address.map((item, index) => (
                 <div className="p-6" key={index}>
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex justify-between items-start">
+                  <div className="rounded-lg border p-4">
+                    <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{item.name}</span>
@@ -90,7 +91,7 @@ export default function AddressPage() {
                           {item.city}, {item.province} {item.postalCode}
                         </div>
                         {item.isPrimary && (
-                          <div className="inline-block border-primary mt-2 px-2 py-1 border rounded text-primary text-xs">
+                          <div className="mt-2 inline-block rounded border border-primary px-2 py-1 text-xs text-primary">
                             Utama
                           </div>
                         )}
@@ -130,7 +131,7 @@ export default function AddressPage() {
             </div>
           ) : (
             <div className="p-6 text-center">
-              <MapPin className="mx-auto mb-4 w-12 h-12 text-gray-400" />
+              <MapPin className="mx-auto mb-4 h-12 w-12 text-gray-400" />
               <p className="text-gray-500">Belum ada alamat tersimpan</p>
             </div>
           )}

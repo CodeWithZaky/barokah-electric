@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,9 +83,7 @@ export default function EditAddressPage() {
   if (isAddressLoading) {
     return (
       <UserLayout>
-        <div className="flex-1 p-6">
-          <div className="mx-auto max-w-2xl">Loading...</div>
-        </div>
+        <Loading />
       </UserLayout>
     );
   }
@@ -92,9 +91,9 @@ export default function EditAddressPage() {
   return (
     <UserLayout>
       <div className="flex-1 p-6">
-        <div className="shadow mx-auto rounded-lg max-w-2xl">
-          <div className="p-6 border-b">
-            <h1 className="font-medium text-xl">Edit Alamat</h1>
+        <div className="mx-auto max-w-2xl rounded-lg shadow">
+          <div className="border-b p-6">
+            <h1 className="text-xl font-medium">Edit Alamat</h1>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4 p-6">
             <div className="space-y-2">
@@ -138,7 +137,7 @@ export default function EditAddressPage() {
                 required
               />
             </div>
-            <div className="gap-4 grid grid-cols-2">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="city">Kota/Kabupaten</Label>
                 <Input

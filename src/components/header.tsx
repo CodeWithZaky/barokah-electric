@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { api } from "@/utils/api";
 import { Package } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { LuSearch, LuShoppingCart } from "react-icons/lu";
 import { ModeToggle } from "./mode-toggle";
@@ -58,8 +58,8 @@ const Header = () => {
           </Button>
           {status === "unauthenticated" ? (
             <div className="flex items-center gap-2">
-              <Button onClick={() => void signIn()} size="sm">
-                Login
+              <Button size="sm">
+                <Link href="/login">Login</Link>
               </Button>
               <Button asChild variant="outline" size="sm">
                 <Link href="/register">Register</Link>

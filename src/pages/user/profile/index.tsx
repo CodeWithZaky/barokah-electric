@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,9 +30,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <UserLayout>
-        <div className="flex-1 p-6">
-          <div className="mx-auto max-w-2xl">Loading...</div>
-        </div>
+        <Loading />
       </UserLayout>
     );
   }
@@ -48,7 +47,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
-                <Avatar className="w-20 h-20">
+                <Avatar className="h-20 w-20">
                   <AvatarImage
                     src={userData?.image || ""}
                     alt={userData?.name || ""}
@@ -58,7 +57,7 @@ export default function ProfilePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-bold text-2xl">{userData?.name}</h2>
+                  <h2 className="text-2xl font-bold">{userData?.name}</h2>
                   <p className="text-gray-500">{userData?.email}</p>
                 </div>
               </div>

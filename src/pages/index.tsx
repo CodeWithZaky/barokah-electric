@@ -1,4 +1,5 @@
 import { CarouselProduct } from "@/components/carousel";
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -32,7 +33,7 @@ export default function Home() {
   });
 
   if (productStatus === "pending") {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,12 +57,9 @@ export default function OrderDashboard() {
     await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
   };
 
-  if (isLoading)
-    return (
-      <div className="flex min-h-screen w-full animate-pulse items-center justify-center text-5xl">
-        Loading...
-      </div>
-    );
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const statusIcons = {
     PENDING: <Clock className="h-5 w-5" />,
