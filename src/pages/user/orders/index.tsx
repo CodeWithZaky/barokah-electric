@@ -21,7 +21,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import UserLayout from "../layout";
 
 export default function OrdersPage() {
@@ -67,79 +67,98 @@ export default function OrdersPage() {
           </TabsList>
           {Object.values(OrderStatus).map((status) => (
             <TabsContent key={status} value={status}>
-              {filteredOrders?.map((order) => (
-                <Card
-                  key={order.id}
-                  className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
-                >
-                  <CardHeader className="bg-primary/5">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg sm:text-xl">
-                        Order #{order.id}
-                      </CardTitle>
-                      <Badge variant="outline" className="text-sm">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </Badge>
-                    </div>
-                    <CardDescription className="text-sm sm:text-base">
-                      Nomor Resi: {order.receipt ?? "Belum tersedia"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6 pt-4">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                      <div className="flex-1">
-                        <h3 className="mb-2 font-semibold">Alamat Tujuan:</h3>
-                        <p className="text-sm">{order.name}</p>
-                        <p className="text-sm">{order.address}</p>
-                        <p className="text-sm">
-                          {order.city}, {order.province}, ID, {order.postalCode}
-                        </p>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="mb-2 font-semibold">
-                          Informasi Pengiriman:
-                        </h3>
-                        <p className="text-sm">
-                          Metode: {order.shippingMethod}
-                        </p>
-                        <p className="text-sm">
-                          Pembayaran: {order.Payment?.paymentMethod}
-                        </p>
-                      </div>
-                    </div>
-                    <Separator />
-                    <ul className="space-y-4">
-                      {order.orderProducts.map((op) => (
-                        <li key={op.id} className="flex items-center gap-4">
-                          <Image
-                            src={op.product.images[0]?.imageURL as string}
-                            alt={op.product.name}
-                            width={80}
-                            height={80}
-                            className="rounded-md object-cover"
-                          />
+              {filteredOrders?.length !== 0 ? (
+                <Fragment>
+                  {filteredOrders?.map((order) => (
+                    <Card
+                      key={order.id}
+                      className="mb-6 overflow-hidden transition-shadow duration-300 hover:shadow-xl"
+                    >
+                      <CardHeader className="bg-primary/5">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg sm:text-xl">
+                            Order #{order.id}
+                          </CardTitle>
+                          <Badge variant="outline" className="text-sm">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </Badge>
+                        </div>
+                        <CardDescription className="text-sm sm:text-base">
+                          Nomor Resi: {order.receipt ?? "Belum tersedia"}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6 pt-4">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                           <div className="flex-1">
-                            <p className="font-medium">{op.product.name}</p>
-                            <p className="text-sm text-gray-500">
-                              Qty: {op.quantity}
+                            <h3 className="mb-2 font-semibold">
+                              Alamat Tujuan:
+                            </h3>
+                            <p className="text-sm">{order.name}</p>
+                            <p className="text-sm">{order.address}</p>
+                            <p className="text-sm">
+                              {order.city}, {order.province}, ID,{" "}
+                              {order.postalCode}
                             </p>
                           </div>
-                          <p className="font-semibold">
-                            Rp{op.product.price.toLocaleString()}
+                          <div className="flex-1">
+                            <h3 className="mb-2 font-semibold">
+                              Informasi Pengiriman:
+                            </h3>
+                            <p className="text-sm">
+                              Metode: {order.shippingMethod}
+                            </p>
+                            <p className="text-sm">
+                              Pembayaran: {order.Payment?.paymentMethod}
+                            </p>
+                          </div>
+                        </div>
+                        <Separator />
+                        <ul className="space-y-4">
+                          {order.orderProducts.map((op) => (
+                            <li key={op.id} className="flex items-center gap-4">
+                              <Image
+                                src={op.product.images[0]?.imageURL as string}
+                                alt={op.product.name}
+                                width={80}
+                                height={80}
+                                className="rounded-md object-cover"
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">{op.product.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  Qty: {op.quantity}
+                                </p>
+                              </div>
+                              <p className="font-semibold">
+                                Rp{op.product.price.toLocaleString()}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                        <Separator />
+                        <div className="flex items-center justify-between pt-2">
+                          <p className="text-lg font-semibold">
+                            Total Pesanan:
                           </p>
-                        </li>
-                      ))}
-                    </ul>
-                    <Separator />
-                    <div className="flex items-center justify-between pt-2">
-                      <p className="text-lg font-semibold">Total Pesanan:</p>
-                      <p className="text-xl font-bold text-primary">
-                        Rp{(order.total / 100).toLocaleString()}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                          <p className="text-xl font-bold text-primary">
+                            Rp{(order.total / 100).toLocaleString()}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <Card className="py-20 text-center text-muted-foreground">
+                    <CardContent>
+                      <CardTitle className="text-3xl">
+                        Status {activeTab} Is Empty!
+                      </CardTitle>
+                    </CardContent>
+                  </Card>
+                </Fragment>
+              )}
             </TabsContent>
           ))}
         </Tabs>

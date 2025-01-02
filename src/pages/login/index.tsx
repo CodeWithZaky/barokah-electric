@@ -22,16 +22,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-
   const { status } = useSession();
 
-  if (status === "loading") {
-    return <Loading />;
-  }
-
-  if (status === "authenticated") {
-    router.push("/");
-  }
+  if (status === "loading") return <Loading />;
+  if (status === "authenticated") router.push("/");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

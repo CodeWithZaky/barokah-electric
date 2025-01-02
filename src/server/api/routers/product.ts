@@ -10,6 +10,7 @@ export const productRouter = createTRPCRouter({
         description: z.string(),
         price: z.number().positive(),
         rate: z.number().min(0).max(5),
+        stock: z.number().positive(),
         published: z.boolean().default(false),
         images: z.array(
           z.object({
@@ -27,6 +28,7 @@ export const productRouter = createTRPCRouter({
           description: input.description,
           price: Number(input.price),
           rate: Number(input.rate),
+          stock: Number(input.stock),
           published: input.published,
           userId: userId,
           images: {
@@ -78,6 +80,7 @@ export const productRouter = createTRPCRouter({
         description: z.string().optional(),
         price: z.number().positive().optional(),
         rate: z.number().min(0).max(5).optional(),
+        stock: z.number().positive().optional(),
         published: z.boolean().optional(),
         images: z
           .array(
@@ -117,6 +120,7 @@ export const productRouter = createTRPCRouter({
           description: input.description,
           price: Number(input.price),
           rate: Number(input.rate),
+          stock: Number(input.stock),
           published: input.published,
           images: input.images
             ? {
@@ -158,5 +162,23 @@ export const productRouter = createTRPCRouter({
       });
 
       return { success: true };
+    }),
+
+  // search product
+  search: publicProcedure
+    .input(z.object({ query: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const products = await ctx.db.product.findMany({
+        where: {
+          name: {
+            contains: input.query,
+            mode: "insensitive",
+          },
+        },
+        include: {
+          images: true,
+        },
+      });
+      return products;
     }),
 });

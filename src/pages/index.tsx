@@ -68,6 +68,9 @@ export default function Home() {
               <div className="flex flex-1 flex-col justify-between p-4">
                 <div>
                   <h2 className="mb-2 text-lg font-semibold">{product.name}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    stock : {product.stock}
+                  </p>
                   <p className="text-xl font-bold text-green-700">
                     Rp
                     {product.price.toLocaleString("id-ID")}

@@ -22,6 +22,7 @@ const productSchema = z.object({
   description: z.string(),
   price: z.number().positive(),
   rate: z.number().min(0).max(5),
+  stock: z.number().positive(),
   published: z.boolean().default(false),
   images: z.array(
     z.object({
@@ -46,6 +47,7 @@ export default function ProductForm({
     description: "",
     price: 0,
     rate: 0,
+    stock: 0,
     published: true,
     images: [],
   });
@@ -89,6 +91,7 @@ export default function ProductForm({
         description: productById.description || "",
         price: productById.price || 0,
         rate: productById.rate || 0,
+        stock: productById.stock || 0,
         published: productById.published || true,
         images: productById.images || [],
       });
@@ -131,102 +134,130 @@ export default function ProductForm({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="flex h-[90vh] max-w-[80vw] flex-col">
+        <DialogHeader className="h-fit">
           <DialogTitle>
             {productId ? "Edit Product" : "Create Product"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="price">Price</Label>
-            <Input
-              id="price"
-              name="price"
-              type="number"
-              step="0.01"
-              value={formData.price}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="images">Images</Label>
-            <div className="flex flex-wrap gap-2">
-              {formData.images.map((image, index) => (
-                <div key={index} className="relative">
-                  <Image
-                    src={image.imageURL}
-                    alt="Product"
-                    width={100}
-                    height={100}
-                    className="rounded-md"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="-top-2 -right-2 absolute w-6 h-6"
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    <X size={12} />
-                  </Button>
-                </div>
-              ))}
+        <form onSubmit={handleSubmit} className="flex h-full w-full gap-5">
+          <div className="flex w-1/2 flex-col justify-between gap-3">
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
             </div>
-            <UploadButton
-              endpoint="imageUploader"
-              onClientUploadComplete={(res) => {
-                if (res) {
-                  const newImage = {
-                    imageURL: res[0]?.url || "",
-                  };
-                  setFormData((prev) => ({
-                    ...prev,
-                    images: [...prev.images, newImage],
-                  }));
-                }
-              }}
-              onUploadError={(error: Error) => {
-                toast({
-                  title: "Upload Error",
-                  description: error.message,
-                  variant: "destructive",
-                });
-              }}
-            />
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                className="h-[200px]"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="stock">Stock</Label>
+              <Input
+                id="stock"
+                name="stock"
+                type="number"
+                value={formData.stock}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Price</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                step="0.01"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="published"
-              checked={formData.published}
-              onCheckedChange={handleSwitchChange}
-            />
-            <Label htmlFor="published">Published</Label>
+          <div className="flex w-1/2 flex-col justify-between gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="images">Images</Label>
+              <div className="flex flex-wrap gap-2">
+                {formData.images.length > 0 ? (
+                  <>
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="relative">
+                        <Image
+                          src={image.imageURL}
+                          alt="Product"
+                          width={150}
+                          height={150}
+                          className="rounded-md bg-gray-500"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -right-2 -top-2 h-6 w-6"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <X size={12} />
+                        </Button>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="relative">
+                      <div className="h-[150px] w-[150px] animate-pulse rounded-md bg-gray-500" />
+                    </div>
+                  </>
+                )}
+              </div>
+              <UploadButton
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  if (res) {
+                    const newImage = {
+                      imageURL: res[0]?.url || "",
+                    };
+                    setFormData((prev) => ({
+                      ...prev,
+                      images: [...prev.images, newImage],
+                    }));
+                  }
+                }}
+                onUploadError={(error: Error) => {
+                  toast({
+                    title: "Upload Error",
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                }}
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="published"
+                  checked={formData.published}
+                  onCheckedChange={handleSwitchChange}
+                />
+                <Label htmlFor="published">Published</Label>
+              </div>
+              <Button type="submit" className="w-full">
+                {productId ? "Update Product" : "Create Product"}
+              </Button>
+            </div>
           </div>
-          <Button type="submit" className="w-full">
-            {productId ? "Update Product" : "Create Product"}
-          </Button>
         </form>
       </DialogContent>
     </Dialog>

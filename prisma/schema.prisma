@@ -81,6 +81,7 @@ model Product {
     description   String
     price         Float
     rate          Float
+    stock         Int            @default(0)
     published     Boolean        @default(false)
     userId        String
     cartItems     CartItem[]

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
+import { formatRupiah } from "@/utils/formatRupiah";
 import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -46,7 +47,7 @@ export default function ProductList({
   }, [onRefetchNeeded, refetch]);
 
   return (
-    <div className="border rounded-md">
+    <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -72,7 +73,7 @@ export default function ProductList({
                 )}
               </TableCell>
               <TableCell className="font-medium">{product.name}</TableCell>
-              <TableCell>${product.price.toFixed(2)}</TableCell>
+              <TableCell>{formatRupiah(product.price)}</TableCell>
               <TableCell>{product.published ? "Yes" : "No"}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
