@@ -1,5 +1,3 @@
-# java9cell REWRITE
-
 This is an e-commerce platform rewrite from java9cell fe and be repos, built using t3stack
 
 ### Technologies
