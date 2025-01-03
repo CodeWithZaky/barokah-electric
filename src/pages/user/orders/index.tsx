@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Fragment, useState } from "react";
 import UserLayout from "../layout";
 
@@ -145,6 +147,24 @@ export default function OrdersPage() {
                           </p>
                         </div>
                       </CardContent>
+                      <CardFooter>
+                        {order.status === "PENDING" && (
+                          <Link
+                            href={`/payment/${order.id}`}
+                            className="rounded bg-green-500 px-4 py-2 text-white"
+                          >
+                            Bayar Sekarang
+                          </Link>
+                        )}
+                        {order.status === "DELIVERED" && (
+                          <Link
+                            href={`/order/return/${order.id}`}
+                            className="rounded bg-yellow-500 px-4 py-2 text-white"
+                          >
+                            Permintaan Pengembalian
+                          </Link>
+                        )}
+                      </CardFooter>
                     </Card>
                   ))}
                 </Fragment>

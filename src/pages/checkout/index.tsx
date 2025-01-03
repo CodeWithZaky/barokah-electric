@@ -1,29 +1,21 @@
 "use client";
 
-import { api } from "@/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { LuFileEdit, LuMapPin } from "react-icons/lu";
 import * as z from "zod";
 
-import { AddressModal } from "@/components/address-modal";
+import { AddressSection } from "@/components/address-section";
 import Loading from "@/components/loading";
+import { PaymentMethodSection } from "@/components/payment-method-section";
+import { ShippingMethodSection } from "@/components/shipping-method-section";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import useSelectedItemStore from "@/stores/selected-cart-item-id";
+import { api } from "@/utils/api";
 
 const ShippingMethod = {
   JNE: "JNE",
@@ -45,67 +37,42 @@ const BankType = {
 } as const;
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Nama harus minimal 2 karakter." }),
-  phone: z
-    .string()
-    .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
-  email: z.string().email({ message: "Alamat email tidak valid." }),
-  address: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
-  postalCode: z
-    .string()
-    .min(5, { message: "Kode pos harus minimal 5 karakter." }),
-  city: z.string().min(2, { message: "Kota harus minimal 2 karakter." }),
-  province: z
-    .string()
-    .min(2, { message: "Provinsi harus minimal 2 karakter." }),
+  addressId: z.number().min(1, "Pilih alamat pengiriman"),
   shippingMethod: z.nativeEnum(ShippingMethod),
   paymentMethod: z.nativeEnum(PaymentMethod),
   bank: z.nativeEnum(BankType).optional(),
   notes: z.string().optional(),
 });
 
-const addressFormSchema = z.object({
-  name: z.string().min(2, { message: "Nama harus minimal 2 karakter." }),
-  phone: z
-    .string()
-    .min(6, { message: "Nomor telepon harus minimal 6 karakter." }),
-  email: z.string().email({ message: "Alamat email tidak valid." }),
-  address: z.string().min(5, { message: "Alamat harus minimal 5 karakter." }),
-  postalCode: z
-    .string()
-    .min(5, { message: "Kode pos harus minimal 5 karakter." }),
-  city: z.string().min(2, { message: "Kota harus minimal 2 karakter." }),
-  province: z
-    .string()
-    .min(2, { message: "Provinsi harus minimal 2 karakter." }),
-});
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const createOrder = api.order.createOrder.useMutation();
   const { selectedItems } = useSelectedItemStore();
 
-  const { data: carts, isLoading } = api.cart.getCartItemsByIds.useQuery({
-    cartItemIds: selectedItems,
-  });
+  const { data: carts, isLoading: isCartsLoading } =
+    api.cart.getCartItemsByIds.useQuery({
+      cartItemIds: selectedItems,
+    });
+
+  const { data: primaryAddress, isLoading: isPrimaryAddressLoading } =
+    api.address.getPrimaryAddress.useQuery();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      postalCode: "",
-      city: "",
-      province: "",
+      addressId: 0,
       shippingMethod: ShippingMethod.JNE,
       paymentMethod: PaymentMethod.BANK_TRANSFER,
       bank: BankType.BRI,
     },
   });
+
+  useEffect(() => {
+    if (primaryAddress) {
+      form.setValue("addressId", primaryAddress.id);
+    }
+  }, [primaryAddress, form]);
 
   const subtotal =
     carts?.reduce(
@@ -121,16 +88,11 @@ export default function CheckoutPage() {
     [ShippingMethod.TIKI]: 17000,
   };
 
-  const shippingCost = shippingCosts[form.watch("shippingMethod")]
-    ? shippingCosts[form.watch("shippingMethod")]
-    : shippingCosts[ShippingMethod.JNE];
-  // shippingCosts[form.watch("shippingMethod") as keyof typeof ShippingMethod];
+  const shippingCost =
+    shippingCosts[
+      form.watch("shippingMethod") as keyof typeof ShippingMethod
+    ] || shippingCosts[ShippingMethod.JNE];
   const total = subtotal + shippingCost;
-
-  const handleAddressSubmit = (values: z.infer<typeof addressFormSchema>) => {
-    form.reset(values);
-    setIsAddressModalOpen(false);
-  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -145,6 +107,13 @@ export default function CheckoutPage() {
 
       const orderData = {
         ...values,
+        name: primaryAddress?.name || "",
+        email: primaryAddress?.email || "",
+        phone: primaryAddress?.phone || "",
+        address: primaryAddress?.address || "",
+        postalCode: primaryAddress?.postalCode || "",
+        city: primaryAddress?.city || "",
+        province: primaryAddress?.province || "",
         total,
         products: carts.map((item) => ({
           productId: item.productId,
@@ -169,38 +138,13 @@ export default function CheckoutPage() {
     }
   }
 
-  if (isLoading) {
+  if (isCartsLoading || isPrimaryAddressLoading) {
     return <Loading />;
   }
 
   return (
     <div className="mx-auto min-h-screen max-w-4xl space-y-4 p-4">
-      <div className="rounded-lg p-4 shadow-sm">
-        <div className="mb-4 flex items-center justify-between border-b pb-4">
-          <div className="flex items-center gap-2">
-            <LuMapPin className="h-5 w-5 text-primary" />
-            <span className="font-medium">Alamat Pengiriman</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-primary"
-            onClick={() => setIsAddressModalOpen(true)}
-          >
-            <LuFileEdit className="mr-2 h-4 w-4" />
-            Ubah
-          </Button>
-        </div>
-        <div className="space-y-1 text-sm">
-          <p className="font-medium">{form.watch("name") || "Nama Penerima"}</p>
-          <p className="text-muted-foreground">
-            {form.watch("phone") || "Nomor Telepon"}
-          </p>
-          <p className="text-muted-foreground">
-            {form.watch("address") || "Alamat Lengkap"}
-          </p>
-        </div>
-      </div>
+      <AddressSection />
 
       <div className="rounded-lg shadow-sm">
         <div className="grid grid-cols-[2fr,1fr,1fr,1fr] gap-4 border-b p-4 text-sm text-muted-foreground">
@@ -250,123 +194,16 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="rounded-lg p-4 shadow-sm">
-        <div className="mb-4 font-medium">Metode Pengiriman</div>
-        <Form {...form}>
-          <FormField
-            control={form.control}
-            name="shippingMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="space-y-2"
-                  >
-                    {Object.entries(shippingCosts).map(([method, cost]) => (
-                      <div
-                        key={method}
-                        className="flex items-center justify-between rounded-lg border p-4"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value={method} id={method} />
-                          <Label htmlFor={method}>{method}</Label>
-                        </div>
-                        <span>Rp{cost.toLocaleString()}</span>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Form>
-      </div>
+      <ShippingMethodSection form={form} />
+      <PaymentMethodSection form={form} />
 
-      <div className="rounded-lg p-4 shadow-sm">
-        <div className="mb-4 font-medium">Metode Pembayaran</div>
-        <Form {...form}>
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="paymentMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        if (value === PaymentMethod.COD) {
-                          form.setValue("bank", undefined);
-                        }
-                      }}
-                      defaultValue={field.value}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center space-x-2 rounded-lg border p-4">
-                        <RadioGroupItem value={PaymentMethod.COD} id="cod" />
-                        <Label htmlFor="cod">Bayar di Tempat (COD)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2 rounded-lg border p-4">
-                        <RadioGroupItem
-                          value={PaymentMethod.BANK_TRANSFER}
-                          id="bank"
-                        />
-                        <Label htmlFor="bank">Transfer Bank</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {form.watch("paymentMethod") === PaymentMethod.BANK_TRANSFER && (
-              <FormField
-                control={form.control}
-                name="bank"
-                render={({ field }) => (
-                  <FormItem className="ml-6">
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="space-y-2"
-                      >
-                        {Object.values(BankType).map((bank) => (
-                          <div
-                            key={bank}
-                            className="flex items-center space-x-2 rounded-lg border p-4"
-                          >
-                            <RadioGroupItem
-                              value={bank}
-                              id={bank.toLowerCase()}
-                            />
-                            <Label htmlFor={bank.toLowerCase()}>
-                              Bank {bank}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-        </Form>
-      </div>
-
-      <div className="rounded-lg p-4 shadow-sm">
+      {/* <div className="shadow-sm p-4 rounded-lg">
         <div className="mb-4 font-medium">Voucher</div>
         <div className="flex gap-2">
           <Input placeholder="Masukkan kode voucher" />
           <Button variant="outline">Gunakan</Button>
         </div>
-      </div>
+      </div> */}
 
       <div className="sticky bottom-0 rounded-lg p-4 shadow-sm backdrop-blur-md">
         <div className="flex items-center justify-between">
@@ -382,8 +219,7 @@ export default function CheckoutPage() {
             <div className="text-xs text-muted-foreground">
               Total Produk: Rp{subtotal.toLocaleString()}
               <br />
-              Total Ongkos Kirim: Rp
-              {shippingCost.toLocaleString()}
+              Total Ongkos Kirim: Rp{shippingCost.toLocaleString()}
             </div>
           </div>
           <Button
@@ -396,13 +232,6 @@ export default function CheckoutPage() {
           </Button>
         </div>
       </div>
-
-      <AddressModal
-        open={isAddressModalOpen}
-        onOpenChange={setIsAddressModalOpen}
-        onSubmit={handleAddressSubmit}
-        defaultValues={form.getValues()}
-      />
     </div>
   );
 }

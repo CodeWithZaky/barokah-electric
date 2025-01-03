@@ -183,7 +183,6 @@ enum OrderStatus {
     RETURN_REQUEST
     RETURNED
     REFUNDED
-    FAILED
     COMPLETED
 }
 

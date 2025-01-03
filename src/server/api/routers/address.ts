@@ -135,4 +135,11 @@ export const addressRouter = createTRPCRouter({
 
       return address;
     }),
+
+  getPrimaryAddress: protectedProcedure.query(({ ctx }) => {
+    const userId = ctx.session.user.id;
+    return ctx.db.address.findFirst({
+      where: { userId, isPrimary: true },
+    });
+  }),
 });

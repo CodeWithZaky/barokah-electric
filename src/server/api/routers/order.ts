@@ -35,6 +35,24 @@ export const orderRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       const receiptNumber = receiptGenerator();
 
+      // logika untuk membuat accounnumber dari nomor telepon
+      let accountNumber = "";
+      if (paymentMethod === "BANK_TRANSFER") {
+        const phoneNumber = await ctx.db.address.findFirst({
+          select: {
+            phone: true,
+          },
+          where: {
+            isPrimary: true,
+          },
+        });
+        if (phoneNumber !== null) {
+          accountNumber += phoneNumber.phone;
+        } else {
+          accountNumber = "";
+        }
+      }
+
       // Buat `order` baru dengan relasi ke `orderProducts`
       const order = await ctx.db.order.create({
         data: {
@@ -51,6 +69,7 @@ export const orderRouter = createTRPCRouter({
             create: {
               paymentMethod,
               bank,
+              accountNumber,
             },
           },
         },
@@ -58,6 +77,15 @@ export const orderRouter = createTRPCRouter({
           orderProducts: { include: { product: true } },
         },
       });
+
+      if (paymentMethod === "COD") {
+        await ctx.db.order.update({
+          where: { id: order.id },
+          data: {
+            status: OrderStatus.PROCESSING,
+          },
+        });
+      }
 
       return order;
     }),
@@ -113,6 +141,33 @@ export const orderRouter = createTRPCRouter({
 
     return orders;
   }),
+
+  // get order by id
+  getOrderById: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const order = await ctx.db.order.findUnique({
+        where: { id: input.orderId },
+        include: {
+          orderProducts: {
+            include: {
+              product: {
+                include: {
+                  images: true,
+                },
+              },
+            },
+          },
+          Payment: {
+            select: {
+              paymentMethod: true,
+            },
+          },
+        },
+      });
+
+      return order;
+    }),
 
   // Update Order Status
   updateOrderStatus: protectedProcedure
