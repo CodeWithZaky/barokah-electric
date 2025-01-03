@@ -196,4 +196,31 @@ export const orderRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  // get order by receipt
+  getOrderReceipt: protectedProcedure
+    .input(z.object({ receipt: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const order = await ctx.db.order.findFirst({
+        where: { receipt: input.receipt },
+        include: {
+          orderProducts: {
+            include: {
+              product: {
+                include: {
+                  images: true,
+                },
+              },
+            },
+          },
+          Payment: {
+            select: {
+              paymentMethod: true,
+            },
+          },
+        },
+      });
+
+      return order;
+    }),
 });
