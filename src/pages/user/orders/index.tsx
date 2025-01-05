@@ -1,5 +1,7 @@
 import Loading from "@/components/loading";
+import { PictureOrderProofModal } from "@/components/picture-order-proof-modal";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -28,8 +30,15 @@ import UserLayout from "../layout";
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
-  const { data: orders, isLoading } = api.order.getOrderUserId.useQuery();
+  const {
+    data: orders,
+    isLoading,
+    refetch,
+  } = api.order.getOrderUserId.useQuery();
 
+  const finishOrder = api.order.updateOrderStatus.useMutation({
+    onSuccess: () => refetch(),
+  });
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
   if (isLoading) return <Loading />;
@@ -42,6 +51,19 @@ export default function OrdersPage() {
     DELIVERED: <ShoppingBag className="h-5 w-5" />,
     COMPLETED: <CheckCircle className="h-5 w-5" />,
     CANCELLED: <XCircle className="h-5 w-5" />,
+  };
+
+  const statusMessage = {
+    PENDING: "pesanan menunggu pembayaran",
+    PROCESSING: "pesanan sedang diproses",
+    PACKED: "pesanan sedang dikemas",
+    SHIPPED: "pesanan sedang dikirim",
+    DELIVERED: "pesanan dalam proses pengiriman",
+    COMPLETED: "Pesanan tiba di alamat tujuan. diterima oleh Yang bersangkutan",
+    CANCELLED: "pesanan dibatalkan",
+    RETURN_REQUEST: "pesanan sedang dikembalikan",
+    RETURNED: "pesanan sudah dikembalikan",
+    REFUNDED: "pesanan sudah dikembalikan",
   };
 
   return (
@@ -81,9 +103,23 @@ export default function OrdersPage() {
                           <CardTitle className="text-lg sm:text-xl">
                             Order #{order.id}
                           </CardTitle>
-                          <Badge variant="outline" className="text-sm">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </Badge>
+                          <div className="flex gap-3">
+                            <p className="text-green-500">
+                              {statusMessage[order.status]}
+                              {activeTab === "COMPLETED" && (
+                                <PictureOrderProofModal
+                                  image={order.image ?? ""}
+                                >
+                                  <span className="cursor-pointer px-1 text-blue-500">
+                                    Lihat Bukti Pengiriman
+                                  </span>
+                                </PictureOrderProofModal>
+                              )}
+                            </p>
+                            <Badge variant="outline" className="text-sm">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </Badge>
+                          </div>
                         </div>
                         <CardDescription className="text-sm sm:text-base">
                           Nomor Resi: {order.receipt ?? "Belum tersedia"}
@@ -114,6 +150,7 @@ export default function OrdersPage() {
                             </p>
                           </div>
                         </div>
+
                         <Separator />
                         <ul className="space-y-4">
                           {order.orderProducts.map((op) => (
@@ -157,12 +194,21 @@ export default function OrdersPage() {
                           </Link>
                         )}
                         {order.status === "DELIVERED" && (
-                          <Link
-                            href={`/order/return/${order.id}`}
-                            className="rounded bg-yellow-500 px-4 py-2 text-white"
-                          >
-                            Permintaan Pengembalian
-                          </Link>
+                          <div className="space-x-2">
+                            <Button variant="outline">
+                              Permintaan Pengembalian
+                            </Button>
+                            <Button
+                              onClick={() =>
+                                finishOrder.mutateAsync({
+                                  orderId: order.id,
+                                  status: "COMPLETED",
+                                })
+                              }
+                            >
+                              Pesanan Selesai
+                            </Button>
+                          </div>
                         )}
                       </CardFooter>
                     </Card>

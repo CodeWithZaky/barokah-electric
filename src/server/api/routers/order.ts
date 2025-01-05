@@ -223,4 +223,21 @@ export const orderRouter = createTRPCRouter({
 
       return order;
     }),
+
+  // update image order for confirmation
+  updateImageOrder: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.number(),
+        image: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const updatedOrder = await ctx.db.order.update({
+        where: { id: input.orderId },
+        data: { image: input.image },
+      });
+
+      return updatedOrder;
+    }),
 });

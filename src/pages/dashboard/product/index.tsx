@@ -34,9 +34,9 @@ export default function ProductsDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto py-8 container">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="font-bold text-3xl">Product Management</h1>
+      <div className="container mx-auto py-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Product Management</h1>
           <Button
             onClick={() => openModal()}
             className="flex items-center gap-2"

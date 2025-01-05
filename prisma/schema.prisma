@@ -133,6 +133,7 @@ model Order {
     updatedAt      DateTime       @updatedAt
     notes          String?
     province       String
+    image          String?
     shippingMethod ShippingMethod @default(JNT)
     user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
     orderProducts  OrderProduct[]
