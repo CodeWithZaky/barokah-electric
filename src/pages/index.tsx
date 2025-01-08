@@ -92,7 +92,7 @@ export default function Home() {
                     Add to Cart
                   </Button>
                   <Button asChild size="sm" className="flex-1">
-                    <Link href={`/checkout?id=${product.id}`}>
+                    <Link href={`/checkout/${product.id}`}>
                       <LuCreditCard className="mr-2 h-4 w-4" />
                       Buy Now
                     </Link>
