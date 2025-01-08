@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -196,14 +194,6 @@ export default function CheckoutPage() {
 
       <ShippingMethodSection form={form} />
       <PaymentMethodSection form={form} />
-
-      {/* <div className="shadow-sm p-4 rounded-lg">
-        <div className="mb-4 font-medium">Voucher</div>
-        <div className="flex gap-2">
-          <Input placeholder="Masukkan kode voucher" />
-          <Button variant="outline">Gunakan</Button>
-        </div>
-      </div> */}
 
       <div className="sticky bottom-0 rounded-lg p-4 shadow-sm backdrop-blur-md">
         <div className="flex items-center justify-between">
