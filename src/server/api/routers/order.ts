@@ -161,6 +161,7 @@ export const orderRouter = createTRPCRouter({
           Payment: {
             select: {
               paymentMethod: true,
+              bank: true,
             },
           },
         },

@@ -13,6 +13,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
+import { formatRupiah } from "@/utils/formatRupiah";
 import { OrderStatus } from "@prisma/client";
 import {
   Box,
@@ -36,39 +37,44 @@ export default function OrdersPage() {
     refetch,
   } = api.order.getOrderUserId.useQuery();
 
-  const finishOrder = api.order.updateOrderStatus.useMutation({
+  const updateOrderStatus = api.order.updateOrderStatus.useMutation({
     onSuccess: () => refetch(),
   });
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
   if (isLoading) return <Loading />;
 
+  const iconsStyle = "h-2 w-2";
+
   const statusIcons = {
-    PENDING: <Clock className="h-5 w-5" />,
-    PROCESSING: <Package className="h-5 w-5" />,
-    PACKED: <Box className="h-5 w-5" />,
-    SHIPPED: <Truck className="h-5 w-5" />,
-    DELIVERED: <ShoppingBag className="h-5 w-5" />,
-    COMPLETED: <CheckCircle className="h-5 w-5" />,
-    CANCELLED: <XCircle className="h-5 w-5" />,
+    PENDING: <Clock className={iconsStyle} />,
+    PROCESSING: <Package className={iconsStyle} />,
+    PACKED: <Box className={iconsStyle} />,
+    SHIPPED: <Truck className={iconsStyle} />,
+    DELIVERED: <ShoppingBag className={iconsStyle} />,
+    RETURN_REQUEST: <ShoppingBag className={iconsStyle} />,
+    RETURNED: <ShoppingBag className={iconsStyle} />,
+    COMPLETED: <CheckCircle className={iconsStyle} />,
+    CANCELLED: <XCircle className={iconsStyle} />,
   };
 
   const statusMessage = {
-    PENDING: "pesanan menunggu pembayaran",
-    PROCESSING: "pesanan sedang diproses",
-    PACKED: "pesanan sedang dikemas",
-    SHIPPED: "pesanan sedang dikirim",
-    DELIVERED: "pesanan dalam proses pengiriman",
-    COMPLETED: "Pesanan tiba di alamat tujuan. diterima oleh Yang bersangkutan",
-    CANCELLED: "pesanan dibatalkan",
-    RETURN_REQUEST: "pesanan sedang dikembalikan",
-    RETURNED: "pesanan sudah dikembalikan",
-    REFUNDED: "pesanan sudah dikembalikan",
+    PENDING: "Pesanan sedang menunggu pembayaran.",
+    PROCESSING: "Pesanan Anda sedang diproses.",
+    PACKED: "Pesanan Anda sedang dikemas.",
+    SHIPPED: "Pesanan Anda sedang dalam perjalanan.",
+    DELIVERED: "Pesanan sedang dalam proses pengantaran.",
+    COMPLETED:
+      "Pesanan telah tiba di alamat tujuan dan diterima oleh yang bersangkutan.",
+    CANCELLED: "Pesanan telah dibatalkan.",
+    RETURN_REQUEST: "Pengajuan pengembalian pesanan sedang diproses.",
+    RETURNED: "Pesanan telah berhasil dikembalikan.",
+    REFUNDED: "Pengembalian dana untuk pesanan telah selesai.",
   };
 
   return (
     <UserLayout>
-      <div className="min-h-screen p-4">
+      <div className="mx-auto min-h-screen p-5">
         <h1 className="mb-6 text-center text-3xl font-bold text-primary">
           Pesanan Saya
         </h1>
@@ -77,7 +83,7 @@ export default function OrdersPage() {
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
           className="rounded-lg shadow-lg"
         >
-          <TabsList className="grid w-full grid-cols-7 gap-2">
+          <TabsList className="flex w-full justify-between gap-1">
             {Object.entries(statusIcons).map(([status, icon]) => (
               <TabsTrigger
                 key={status}
@@ -85,7 +91,7 @@ export default function OrdersPage() {
                 className="flex items-center justify-center gap-2"
               >
                 {icon}
-                <span className="hidden sm:inline">{status}</span>
+                <span className="hidden text-xs sm:inline">{status}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -169,7 +175,7 @@ export default function OrdersPage() {
                                 </p>
                               </div>
                               <p className="font-semibold">
-                                Rp{op.product.price.toLocaleString()}
+                                {formatRupiah(op.product.price)}
                               </p>
                             </li>
                           ))}
@@ -180,7 +186,7 @@ export default function OrdersPage() {
                             Total Pesanan:
                           </p>
                           <p className="text-xl font-bold text-primary">
-                            Rp{(order.total / 100).toLocaleString()}
+                            {formatRupiah(order.total)}
                           </p>
                         </div>
                       </CardContent>
@@ -195,12 +201,20 @@ export default function OrdersPage() {
                         )}
                         {order.status === "DELIVERED" && (
                           <div className="space-x-2">
-                            <Button variant="outline">
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                updateOrderStatus.mutateAsync({
+                                  orderId: order.id,
+                                  status: "RETURN_REQUEST",
+                                })
+                              }
+                            >
                               Permintaan Pengembalian
                             </Button>
                             <Button
                               onClick={() =>
-                                finishOrder.mutateAsync({
+                                updateOrderStatus.mutateAsync({
                                   orderId: order.id,
                                   status: "COMPLETED",
                                 })

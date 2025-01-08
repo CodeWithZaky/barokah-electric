@@ -19,6 +19,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/utils/api";
+import { formatRupiah } from "@/utils/formatRupiah";
 import { OrderStatus } from "@prisma/client";
 import {
   Box,
@@ -34,6 +35,14 @@ import Image from "next/image";
 import { Fragment, useState } from "react";
 import DashboardLayout from "../layout";
 
+type StatusOrderAdmin = "PROCESSING" | "PACKED" | "CANCELLED";
+
+const statusOrderAdmin: StatusOrderAdmin[] = [
+  "PROCESSING",
+  "PACKED",
+  "CANCELLED",
+];
+
 export default function OrderDashboard() {
   const [activeTab, setActiveTab] = useState<OrderStatus>("PENDING");
 
@@ -46,15 +55,11 @@ export default function OrderDashboard() {
     onSuccess: () => refetch(),
   });
 
-  const cancelledOrder = api.order.updateOrderStatus.useMutation({
-    onSuccess: () => refetch(),
-  });
-
   const filteredOrders = orders?.filter((order) => order.status === activeTab);
 
   const handleStatusChange = async (
     orderId: number,
-    newStatus: OrderStatus,
+    newStatus: StatusOrderAdmin,
   ) => {
     await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
   };
@@ -63,19 +68,23 @@ export default function OrderDashboard() {
     return <Loading />;
   }
 
+  const iconsStyle = "h-2 w-2";
+
   const statusIcons = {
-    PENDING: <Clock className="h-5 w-5" />,
-    PROCESSING: <Package className="h-5 w-5" />,
-    PACKED: <Box className="h-5 w-5" />,
-    SHIPPED: <Truck className="h-5 w-5" />,
-    DELIVERED: <ShoppingBag className="h-5 w-5" />,
-    COMPLETED: <CheckCircle className="h-5 w-5" />,
-    CANCELLED: <XCircle className="h-5 w-5" />,
+    PENDING: <Clock className={iconsStyle} />,
+    PROCESSING: <Package className={iconsStyle} />,
+    PACKED: <Box className={iconsStyle} />,
+    SHIPPED: <Truck className={iconsStyle} />,
+    DELIVERED: <ShoppingBag className={iconsStyle} />,
+    RETURN_REQUEST: <ShoppingBag className={iconsStyle} />,
+    RETURNED: <ShoppingBag className={iconsStyle} />,
+    COMPLETED: <CheckCircle className={iconsStyle} />,
+    CANCELLED: <XCircle className={iconsStyle} />,
   };
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto min-h-screen p-4">
+      <div className="mx-auto min-h-screen">
         <h1 className="mb-6 text-center text-3xl font-bold text-primary">
           Pesanan
         </h1>
@@ -84,7 +93,7 @@ export default function OrderDashboard() {
           onValueChange={(value) => setActiveTab(value as OrderStatus)}
           className="rounded-lg shadow-lg"
         >
-          <TabsList className="grid w-full grid-cols-7 gap-2">
+          <TabsList className="flex w-full justify-between gap-1">
             {Object.entries(statusIcons).map(([status, icon]) => (
               <TabsTrigger
                 key={status}
@@ -92,7 +101,7 @@ export default function OrderDashboard() {
                 className="flex items-center justify-center gap-2"
               >
                 {icon}
-                <span className="hidden sm:inline">{status}</span>
+                <span className="hidden text-xs sm:inline">{status}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -173,49 +182,85 @@ export default function OrderDashboard() {
                             Total Pesanan:
                           </p>
                           <p className="text-xl font-bold text-primary">
-                            Rp
-                            {(order.total / 100).toLocaleString()}
+                            {formatRupiah(order.total)}
                           </p>
                         </div>
                       </CardContent>
                       <CardFooter>
                         {userRole === "ADMIN" && (
-                          <Select
-                            onValueChange={(value) =>
-                              handleStatusChange(order.id, value as OrderStatus)
-                            }
-                            defaultValue={order.status}
-                          >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Change status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(OrderStatus).map((status) => (
-                                <SelectItem key={status} value={status}>
-                                  {status}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <>
+                            {(order.status === "PROCESSING" ||
+                              order.status === "PACKED" ||
+                              order.status === "CANCELLED") && (
+                              <>
+                                <Select
+                                  onValueChange={(value) =>
+                                    handleStatusChange(
+                                      order.id,
+                                      value as StatusOrderAdmin,
+                                    )
+                                  }
+                                  defaultValue={order.status}
+                                >
+                                  <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Change status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Object.values(statusOrderAdmin).map(
+                                      (status) => (
+                                        <SelectItem key={status} value={status}>
+                                          {status}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </>
+                            )}
+                            {(order.status === "PENDING" ||
+                              order.status === "PROCESSING" ||
+                              order.status === "PACKED" ||
+                              order.status === "CANCELLED") && (
+                              <>
+                                <Button
+                                  className="ml-2"
+                                  variant={"destructive"}
+                                  onClick={() =>
+                                    updateOrderStatus.mutate({
+                                      orderId: order.id,
+                                      status: "CANCELLED",
+                                    })
+                                  }
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            )}
+                            {order.status === "RETURN_REQUEST" && (
+                              <>
+                                <Button
+                                  className="ml-2"
+                                  variant={"destructive"}
+                                  onClick={() =>
+                                    updateOrderStatus.mutate({
+                                      orderId: order.id,
+                                      status: "RETURNED",
+                                    })
+                                  }
+                                >
+                                  Accept Return
+                                </Button>
+                              </>
+                            )}
+                          </>
                         )}
+
                         {/* <Button
                       className="ml-2"
                       onClick={() => router.push(`/order/${order.id}`)}
                     >
                       View Details
                     </Button> */}
-                        <Button
-                          className="ml-2"
-                          variant={"destructive"}
-                          onClick={() =>
-                            cancelledOrder.mutate({
-                              orderId: order.id,
-                              status: "CANCELLED",
-                            })
-                          }
-                        >
-                          Cancel
-                        </Button>
                       </CardFooter>
                     </Card>
                   ))}
