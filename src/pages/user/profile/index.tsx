@@ -19,7 +19,7 @@ export default function ProfilePage() {
     useState(false);
 
   const { data: user, isLoading } = api.user.getUserById.useQuery(undefined, {
-    enabled: !!session,
+    enabled: !!session?.user.id,
   });
 
   if (status === "unauthenticated") {

@@ -74,9 +74,7 @@ const Header = () => {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={
-                        session?.user?.image ?? "https://github.com/shadcn.png"
-                      }
+                      src={session?.user?.image || null || undefined}
                       alt={session?.user?.name ?? "User avatar"}
                     />
                     <AvatarFallback>

@@ -12,13 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
 import { UploadButton } from "@/utils/uploadthing";
@@ -83,13 +76,6 @@ export default function Courier() {
     onSuccess: () => response.refetch(),
   });
 
-  const handleStatusChange = async (
-    orderId: number,
-    newStatus: OrderStatus,
-  ) => {
-    await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
-  };
-
   const handleRemoveImage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -118,30 +104,30 @@ export default function Courier() {
               )}
             />
             <Button type="submit" className="w-full font-semibold">
-              Submit
+              Search
             </Button>
           </form>
         </Form>
       </div>
 
       <div className="mt-8 w-full max-w-lg">
-        {orderByReceipt ? (
+        {response.data ? (
           <div className="rounded-lg p-6 shadow-lg">
             <h2 className="mb-4 text-lg font-bold">Detail Order</h2>
             <div className="grid grid-cols-2 gap-4">
               <p className="font-medium">Nomor Resi:</p>
-              <p>{orderByReceipt.receipt}</p>
+              <p>{response.data.receipt}</p>
               <p className="font-medium">ID:</p>
-              <p>{orderByReceipt.id}</p>
+              <p>{response.data.id}</p>
               <p className="font-medium">Metode Pengiriman:</p>
-              <p>{orderByReceipt.shippingMethod}</p>
+              <p>{response.data.shippingMethod}</p>
               <p className="font-medium">Status:</p>
-              <p>{orderByReceipt.status}</p>
+              <p>{response.data.status}</p>
               <p className="font-medium">Total:</p>
-              <p>{orderByReceipt.total}</p>
+              <p>{response.data.total}</p>
             </div>
 
-            {orderByReceipt.status === "DELIVERED" && (
+            {response.data.status === "DELIVERED" && (
               <div className="mt-6 space-y-4">
                 <div className="flex flex-wrap gap-4">
                   {formData.images.length > 0 ? (
@@ -167,10 +153,10 @@ export default function Courier() {
                     ))
                   ) : (
                     <>
-                      {orderByReceipt.image !== null ? (
+                      {response.data.image !== null ? (
                         <div className="relative">
                           <Image
-                            src={orderByReceipt.image}
+                            src={response.data.image}
                             alt="Product"
                             width={150}
                             height={150}
@@ -211,7 +197,7 @@ export default function Courier() {
                   className="w-full font-semibold"
                   onClick={() =>
                     updateImageOrder.mutate({
-                      orderId: orderByReceipt.id,
+                      orderId: response.data?.id || 0,
                       image: formData.images[0]?.imageURL || "",
                     })
                   }
@@ -222,27 +208,38 @@ export default function Courier() {
             )}
 
             <div className="mt-6">
-              <Select
-                onValueChange={(value) =>
-                  handleStatusChange(orderByReceipt.id, value as OrderStatus)
-                }
-                defaultValue={orderByReceipt.status}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Ubah status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {orderStatuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {response.data.status === "PACKED" && (
+                <Button
+                  className="w-full font-semibold"
+                  onClick={() => {
+                    updateOrderStatus.mutateAsync({
+                      orderId: response.data?.id || 0,
+                      status: "SHIPPED",
+                    });
+                    response.refetch();
+                  }}
+                >
+                  PACKED TO SHIPPED
+                </Button>
+              )}
+              {response.data.status === "SHIPPED" && (
+                <Button
+                  className="w-full font-semibold"
+                  onClick={() => {
+                    updateOrderStatus.mutateAsync({
+                      orderId: response.data?.id || 0,
+                      status: "DELIVERED",
+                    });
+                    response.refetch();
+                  }}
+                >
+                  SHIPPED TO DELIVERED
+                </Button>
+              )}
             </div>
           </div>
         ) : (
-          <div className="rounded-lg p-6 text-center shadow-lg">
+          <div className="rounded-lg p-6 text-center text-xl shadow-lg">
             <p>Belum ada data</p>
           </div>
         )}

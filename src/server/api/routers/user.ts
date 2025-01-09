@@ -46,6 +46,23 @@ export const userRoute = createTRPCRouter({
             name,
             email,
             password: hashedPassword,
+            accounts: {},
+          },
+        });
+
+        await ctx.db.account.create({
+          data: {
+            userId: user.id,
+            type: "credentials",
+            provider: "credentials",
+            providerAccountId: user.id.toString(),
+            refresh_token: null,
+            access_token: null,
+            expires_at: null,
+            token_type: null,
+            scope: null,
+            id_token: null,
+            session_state: null,
           },
         });
 

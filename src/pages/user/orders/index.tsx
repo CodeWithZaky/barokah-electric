@@ -112,13 +112,16 @@ export default function OrdersPage() {
                           <div className="flex gap-3">
                             <p className="text-green-500">
                               {statusMessage[order.status]}
-                              {activeTab === "COMPLETED" && (
+                              {(activeTab === "DELIVERED" ||
+                                activeTab === "COMPLETED") && (
                                 <PictureOrderProofModal
                                   image={order.image ?? ""}
                                 >
-                                  <span className="cursor-pointer px-1 text-blue-500">
-                                    Lihat Bukti Pengiriman
-                                  </span>
+                                  {order.image && (
+                                    <span className="cursor-pointer px-1 text-blue-500">
+                                      Lihat Bukti Pengiriman
+                                    </span>
+                                  )}
                                 </PictureOrderProofModal>
                               )}
                             </p>

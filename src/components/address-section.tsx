@@ -13,7 +13,7 @@ export function AddressSection() {
           <LuMapPin className="h-5 w-5 text-primary" />
           <span className="font-medium">Alamat Pengiriman</span>
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center">
           <Link href="/user/address">
             <Button variant="outline" size="sm">
               Pilih Alamat
@@ -28,11 +28,15 @@ export function AddressSection() {
         </div>
       </div>
       {primaryAddress && (
-        <div className="space-y-2">
+        <div className="space-y-2 text-sm">
+          <p className="font-semibold">
+            {primaryAddress.name} {" | "} {primaryAddress.phone}
+          </p>
           <p>{primaryAddress.address}</p>
-          <p>{primaryAddress.city}</p>
-          <p>{primaryAddress.province}</p>
-          <p>{primaryAddress.postalCode}</p>
+          <p>
+            {primaryAddress.city}, {primaryAddress.province},{" "}
+            {primaryAddress.postalCode}
+          </p>
         </div>
       )}
     </div>

@@ -28,13 +28,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
           <main
             className={clsx(
               GeistSans.className,
-              "min-h-screen w-full bg-muted-foreground/50",
+              "mx-auto flex min-h-screen w-full flex-col",
             )}
           >
-            <div className="w-ful mx-auto flex flex-col bg-background">
-              <Header />
-              <Component {...pageProps} />
-            </div>
+            <Header />
+            <Component {...pageProps} />
           </main>
         </ThemeProvider>
       </SessionProvider>
