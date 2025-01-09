@@ -159,6 +159,7 @@ export default function LoginPage() {
   });
 
   if (status === "loading") return <Loading />;
+  if (status === "authenticated") router.push("/");
 
   const onSubmit = async (data: LoginFormValues) => {
     setError(null);
@@ -232,23 +233,23 @@ export default function LoginPage() {
                 )}
               />
               {error && <p className="text-sm text-red-500">{error}</p>}
-            </CardContent>
-            <CardFooter className="flex flex-col gap-3">
               <Button type="submit" className="w-full">
                 {loading ? "Loading..." : "Masuk"}
               </Button>
-              <Button onClick={() => signIn("google")} className="w-full">
-                Login With Google <FcGoogle className="ml-2" size={20} />
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                {"Belum punya akun? "}
-                <Link href="/register" className="text-foreground underline">
-                  Daftar
-                </Link>
-              </span>
-            </CardFooter>
+            </CardContent>
           </form>
         </Form>
+        <CardFooter className="flex flex-col gap-3">
+          <Button onClick={() => signIn("google")} className="w-full">
+            Login With Google <FcGoogle className="ml-2" size={20} />
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            {"Belum punya akun? "}
+            <Link href="/register" className="text-foreground underline">
+              Daftar
+            </Link>
+          </span>
+        </CardFooter>
       </Card>
     </div>
   );
