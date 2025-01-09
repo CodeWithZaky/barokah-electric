@@ -6,12 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import Search from "@/features/search";
 import { api } from "@/utils/api";
 import { Zap } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { LuSearch, LuShoppingCart } from "react-icons/lu";
+import { LuShoppingCart } from "react-icons/lu";
 import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
@@ -28,19 +28,7 @@ const Header = () => {
           <span>BarokahElectric</span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="w-full max-w-sm items-center md:flex">
-            <form className="relative">
-              <LuSearch
-                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="w-full appearance-none bg-transparent pl-8 md:w-[300px] lg:w-[300px]"
-              />
-            </form>
-          </div>
+          <Search />
           <ModeToggle />
           <Button
             variant="ghost"
@@ -92,7 +80,7 @@ const Header = () => {
                 </DropdownMenuItem>
                 {session?.user?.role === "ADMIN" && (
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link href="/dashboard/overview">Dashboard</Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={() => void signOut()}>

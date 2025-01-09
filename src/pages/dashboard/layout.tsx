@@ -13,9 +13,9 @@ import { usePathname } from "next/navigation";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex bg-background min-h-screen">
+    <div className="flex min-h-screen bg-background">
       <Sidebar />
-      <main className="ml-auto p-8 w-[80%] overflow-y-auto">{children}</main>
+      <main className="ml-auto w-[80%] overflow-y-auto p-8">{children}</main>
     </div>
   );
 };
@@ -28,7 +28,7 @@ const Sidebar = () => {
   const LINK_DATA = [
     {
       name: "Overview",
-      href: "/dashboard",
+      href: "/dashboard/overview",
       icon: LayoutDashboard,
     },
     {
@@ -44,11 +44,11 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="lg:block fixed hidden border-r w-[20%]">
-      <div className="flex flex-col gap-2 min-h-screen">
-        <div className="flex items-center px-6 border-b h-[60px]">
+    <div className="fixed hidden w-[20%] border-r lg:block">
+      <div className="flex min-h-screen flex-col gap-2">
+        <div className="flex h-[60px] items-center border-b px-6">
           <Link className="flex items-center gap-2 font-semibold" href="/">
-            <LayoutDashboardIcon className="w-6 h-6" />
+            <LayoutDashboardIcon className="h-6 w-6" />
             <span>Dashboard</span>
           </Link>
         </div>
@@ -63,7 +63,7 @@ const Sidebar = () => {
                     pathname === link.href && "bg-muted",
                   )}
                 >
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="h-4 w-4" />
                   {link.name}
                 </Button>
               </Link>
@@ -71,8 +71,8 @@ const Sidebar = () => {
           </nav>
         </ScrollArea>
         <div className="mt-auto p-4">
-          <Button variant="outline" className="justify-start gap-2 w-full">
-            <LogOut className="w-4 h-4" />
+          <Button variant="outline" className="w-full justify-start gap-2">
+            <LogOut className="h-4 w-4" />
             Log out
           </Button>
         </div>

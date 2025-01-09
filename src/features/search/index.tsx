@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -7,7 +5,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { LuSearch } from "react-icons/lu";
 
 const FormSchema = z.object({
@@ -24,44 +23,41 @@ export default function Search() {
     },
   });
 
-  const { toast } = useToast();
+  const router = useRouter();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="bg-slate-950 mt-2 p-4 rounded-md w-[340px]">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    router.push(`/search?query=${data.searchProduct}`);
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex justify-center gap-1 w-full"
-      >
-        <FormField
-          control={form.control}
-          name="searchProduct"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input
-                  placeholder="search product"
-                  className="w-[500px]"
-                  {...field}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <Button type="submit">
+    <div className="mr-10 flex items-center justify-between gap-1">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex justify-center gap-1"
+        >
+          <FormField
+            control={form.control}
+            name="searchProduct"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="search product"
+                    className="w-[500px]"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
+      <Link href={`/search?query=${form.watch("searchProduct")}`}>
+        <Button className="hover:cursor-pointer">
           <LuSearch className="text-lg" />
         </Button>
-      </form>
-    </Form>
+      </Link>
+    </div>
   );
 }

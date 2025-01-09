@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,12 +8,19 @@ import { RecentSales } from "@/features/dashboard/overview/recent-sales";
 import { api } from "@/utils/api";
 import { formatRupiah } from "@/utils/formatRupiah";
 import { CreditCard, DollarSign, Users } from "lucide-react";
-import DashboardLayout from "./layout";
+import DashboardLayout from "../layout";
 
 export default function OverviewDashboardPage() {
-  const { data: totalSales } = api.dashboard.sumTotalSales.useQuery();
-  const { data: totalOrders } = api.dashboard.sumTotalOrders.useQuery();
-  const { data: totalUsers } = api.dashboard.sumTotalUsers.useQuery();
+  const { data: totalSales, isLoading: totalSalesLoading } =
+    api.dashboard.sumTotalSales.useQuery();
+  const { data: totalOrders, isLoading: totalOrdersLoading } =
+    api.dashboard.sumTotalOrders.useQuery();
+  const { data: totalUsers, isLoading: totalUsersLoading } =
+    api.dashboard.sumTotalUsers.useQuery();
+
+  if (totalSalesLoading || totalOrdersLoading || totalUsersLoading) {
+    return <Loading />;
+  }
 
   return (
     <DashboardLayout>
@@ -28,6 +36,8 @@ export default function OverviewDashboardPage() {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-flow-col justify-stretch gap-4">
