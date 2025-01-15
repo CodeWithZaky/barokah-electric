@@ -43,7 +43,7 @@ export default function Search() {
               <FormItem>
                 <FormControl>
                   <Input
-                    placeholder="search product"
+                    placeholder="cari produk"
                     className="w-[500px]"
                     {...field}
                   />

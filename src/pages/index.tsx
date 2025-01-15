@@ -45,7 +45,7 @@ export default function Home() {
       </Head>
       <main className="container mx-auto flex flex-col gap-5 py-8">
         <CarouselProduct />
-        <h1 className="mt-8 text-3xl font-bold">Our Products</h1>
+        <h1 className="mt-8 text-3xl font-bold">Produk Terbaru</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {products?.map((product) => (
             <Card

@@ -32,12 +32,12 @@ const Sidebar = () => {
       icon: LayoutDashboard,
     },
     {
-      name: "Products",
+      name: "Produk",
       href: "/dashboard/product",
       icon: Package,
     },
     {
-      name: "Orders",
+      name: "Pesanan",
       href: "/dashboard/order",
       icon: ShoppingCart,
     },

@@ -51,11 +51,11 @@ export default function ProductList({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Published</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Gambar</TableHead>
+            <TableHead>Nama</TableHead>
+            <TableHead>Harga</TableHead>
+            <TableHead>Publik</TableHead>
+            <TableHead>Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -74,7 +74,7 @@ export default function ProductList({
               </TableCell>
               <TableCell className="font-medium">{product.name}</TableCell>
               <TableCell>{formatRupiah(product.price)}</TableCell>
-              <TableCell>{product.published ? "Yes" : "No"}</TableCell>
+              <TableCell>{product.published ? "Iya" : "Tidak"}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button

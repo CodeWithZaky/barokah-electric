@@ -36,13 +36,13 @@ export default function ProductsDashboard() {
     <DashboardLayout>
       <div className="container mx-auto py-8">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Product Management</h1>
+          <h1 className="text-3xl font-bold">Manamanajemen produk</h1>
           <Button
             onClick={() => openModal()}
             className="flex items-center gap-2"
           >
             <PlusIcon size={20} />
-            Add Product
+            Tambah Produk
           </Button>
         </div>
         <ProductList onEdit={openModal} onRefetchNeeded={handleRefetchNeeded} />

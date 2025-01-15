@@ -73,10 +73,10 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuItem asChild>
-                  <Link href="/user/profile">Profile</Link>
+                  <Link href="/user/profile">Profil</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/user/orders">Orders</Link>
+                  <Link href="/user/orders">Pesanan</Link>
                 </DropdownMenuItem>
                 {session?.user?.role === "ADMIN" && (
                   <DropdownMenuItem asChild>
