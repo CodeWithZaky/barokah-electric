@@ -1,11 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { env } from "@/env";
+import type { NextApiRequest } from "next";
+import { getToken } from "next-auth/jwt";
 
 import { createUploadthing, type FileRouter } from "uploadthing/next-legacy";
 import { UploadThingError } from "uploadthing/server";
 
 const f = createUploadthing();
 
-const auth = (req: NextApiRequest, res: NextApiResponse) => ({ id: "fakeId" }); // Fake auth function
+const auth = async (req: NextApiRequest) => {
+  const token = await getToken({
+    req: req,
+    secret: env.NEXTAUTH_SECRET,
+  });
+
+  return token;
+};
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
@@ -21,10 +30,9 @@ export const ourFileRouter = {
     },
   })
     // Set permissions and file types for this FileRoute
-    .middleware(async ({ req, res }) => {
+    .middleware(async ({ req }) => {
       // This code runs on your server before upload
-      const user = await auth(req, res);
-
+      const user = await auth(req);
       // If you throw, the user will not be able to upload
       if (!user) throw new UploadThingError("Unauthorized");
 
@@ -33,9 +41,9 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
-      console.log("Upload complete for userId:", metadata.userId);
+      console.log("UPLOADTHING : Upload complete for userId:", metadata.userId);
 
-      console.log("file url", file.url);
+      console.log("UPLOADTHING : file url", file.url);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
