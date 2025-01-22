@@ -1,7 +1,7 @@
 export type UserSession = {
-  id?: string | null | undefined;
-  role?: string | null | undefined;
-  name?: string | null | undefined;
-  email?: string | null | undefined;
-  image?: string | null | undefined;
+  id?: string | null;
+  role?: string | null;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
 };

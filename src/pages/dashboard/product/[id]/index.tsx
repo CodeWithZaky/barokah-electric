@@ -17,17 +17,16 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  // try {
-  const { data: product } = await api.product.getById.useQuery({
+  const { data: product } = api.product.getById.useQuery({
     id: productId,
   });
 
   return (
     <DashboardLayout>
-      <div className="mx-auto py-8 container">
+      <div className="container mx-auto py-8">
         <Card className="mx-auto max-w-3xl">
           <CardHeader>
-            <CardTitle className="font-bold text-3xl">
+            <CardTitle className="text-3xl font-bold">
               {product?.name}
             </CardTitle>
           </CardHeader>
@@ -46,16 +45,16 @@ export default async function ProductDetailPage({
             </div>
 
             <div className="space-y-2">
-              <h2 className="font-semibold text-xl">Description</h2>
+              <h2 className="text-xl font-semibold">Description</h2>
               <p className="text-gray-600">{product?.description}</p>
             </div>
 
             <Separator />
 
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <h2 className="font-semibold text-xl">Price</h2>
-                <p className="font-bold text-2xl text-green-600">
+                <h2 className="text-xl font-semibold">Price</h2>
+                <p className="text-2xl font-bold text-green-600">
                   ${product?.price.toFixed(2)}
                 </p>
               </div>
@@ -65,9 +64,9 @@ export default async function ProductDetailPage({
             </div>
 
             <div className="space-y-2">
-              <h2 className="font-semibold text-xl">Rating</h2>
+              <h2 className="text-xl font-semibold">Rating</h2>
               <div className="flex items-center">
-                <span className="mr-2 font-bold text-2xl">
+                <span className="mr-2 text-2xl font-bold">
                   {product?.rate.toFixed(1)}
                 </span>
                 <span className="text-yellow-500">
@@ -83,10 +82,4 @@ export default async function ProductDetailPage({
       </div>
     </DashboardLayout>
   );
-  // } catch (error: any) {
-  //   if (error.code === "NOT_FOUND") {
-  //     notFound();
-  //   }
-  //   throw error;
-  // }
 }

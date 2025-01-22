@@ -1,17 +1,16 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 import { LuSearch } from "react-icons/lu";
+import { z } from "zod";
 
 const FormSchema = z.object({
-  searchProduct: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  searchProduct: z.string().min(1, {
+    message: "Field must be at least 2 characters.",
   }),
 });
 

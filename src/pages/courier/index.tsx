@@ -14,14 +14,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/utils/api";
+import { formatRupiah } from "@/utils/formatRupiah";
 import { UploadButton } from "@/utils/uploadthing";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 const FormSchema = z.object({
-  receiptNumber: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  receiptNumber: z.string().min(1, {
+    message: "input must be at least 1 characters.",
   }),
 });
 
@@ -33,14 +34,10 @@ const imageSchema = z.object({
   ),
 });
 
-const orderStatuses: OrderStatus[] = ["SHIPPED", "DELIVERED"];
-type OrderStatus = "SHIPPED" | "DELIVERED";
-
 export default function Courier() {
   /**
    * state and hooks
    */
-  const [orderByReceipt, setOrderByReceipt] = useState<any>({});
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -69,11 +66,17 @@ export default function Courier() {
    * functions handlers
    */
   async function onSubmit() {
-    setOrderByReceipt(response.data);
+    response.refetch();
   }
 
   const updateOrderStatus = api.order.updateOrderStatus.useMutation({
-    onSuccess: () => response.refetch(),
+    onSuccess: () => {
+      response.refetch();
+      toast({
+        title: "success",
+        description: "bukti berhasil di tambahkan",
+      });
+    },
   });
 
   const handleRemoveImage = (index: number) => {
@@ -124,7 +127,7 @@ export default function Courier() {
               <p className="font-medium">Status:</p>
               <p>{response.data.status}</p>
               <p className="font-medium">Total:</p>
-              <p>{response.data.total}</p>
+              <p>{formatRupiah(response.data.total)}</p>
             </div>
 
             {response.data.status === "DELIVERED" && (
@@ -240,7 +243,7 @@ export default function Courier() {
           </div>
         ) : (
           <div className="rounded-lg p-6 text-center text-xl shadow-lg">
-            <p>Belum ada data</p>
+            <p>data tidak ditemukan</p>
           </div>
         )}
       </div>
