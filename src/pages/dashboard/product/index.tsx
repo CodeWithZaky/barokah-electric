@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import ProductForm from "@/features/management-product/product-form";
-import ProductList from "@/features/management-product/product-list";
+import ProductForm from "@/features/dashboard/product/product-form";
+import ProductList from "@/features/dashboard/product/product-list";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import DashboardLayout from "../layout";
