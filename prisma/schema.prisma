@@ -157,7 +157,7 @@ model Payment {
     status        PaymentStatus @default(PENDING)
     transactionId String?
     amount        Float         @default(0)
-    bank          String?
+    bank          BankName?
     accountName   String?
     accountNumber String?
     dueDate       DateTime?
@@ -167,6 +167,14 @@ model Payment {
     refundDate    DateTime?
     paymentMethod PaymentMethod @default(COD)
     order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum BankName {
+    BRI
+    BNI
+    BTN
+    BSI
+    MANDIRI
 }
 
 enum UserRole {
