@@ -7,11 +7,8 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
-const PaymentMethod = {
-  COD: "COD",
-  BANK_TRANSFER: "BANK_TRANSFER",
-};
+import { BankName, PaymentMethod, ShippingMethod } from "@prisma/client";
+import { UseFormReturn } from "react-hook-form";
 
 const BankType = {
   BRI: "BRI",
@@ -19,7 +16,21 @@ const BankType = {
   MANDIRI: "MANDIRI",
 };
 
-export function PaymentMethodSection({ form }: any) {
+interface Props {
+  form: UseFormReturn<
+    {
+      shippingMethod: ShippingMethod;
+      paymentMethod: PaymentMethod;
+      addressId: number;
+      notes?: string | undefined;
+      bank?: BankName | undefined;
+    },
+    any,
+    undefined
+  >;
+}
+
+export function PaymentMethodSection({ form }: Props) {
   return (
     <div className="rounded-lg p-4 shadow-sm">
       <div className="mb-4 font-medium">Metode Pembayaran</div>

@@ -1,5 +1,10 @@
 import { receiptGenerator } from "@/utils/receiptGenerator";
-import { OrderStatus, PaymentMethod, ShippingMethod } from "@prisma/client";
+import {
+  BankName,
+  OrderStatus,
+  PaymentMethod,
+  ShippingMethod,
+} from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -20,7 +25,7 @@ export const orderRouter = createTRPCRouter({
         total: z.number(),
         paymentMethod: z.nativeEnum(PaymentMethod),
         shippingMethod: z.nativeEnum(ShippingMethod),
-        bank: z.string().optional(),
+        bank: z.nativeEnum(BankName).optional(),
         products: z.array(
           z.object({
             productId: z.number(),

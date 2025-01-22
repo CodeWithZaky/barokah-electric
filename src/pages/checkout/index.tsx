@@ -11,34 +11,17 @@ import { PaymentMethodSection } from "@/components/payment-method-section";
 import { ShippingMethodSection } from "@/components/shipping-method-section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { shippingCosts } from "@/data/shipping-costs";
 import { useToast } from "@/hooks/use-toast";
 import useSelectedItemStore from "@/stores/selected-cart-item-id";
 import { api } from "@/utils/api";
-
-const ShippingMethod = {
-  JNE: "JNE",
-  JNT: "JNT",
-  SICEPAT: "SICEPAT",
-  POS_INDONESIA: "POS_INDONESIA",
-  TIKI: "TIKI",
-} as const;
-
-const PaymentMethod = {
-  COD: "COD",
-  BANK_TRANSFER: "BANK_TRANSFER",
-} as const;
-
-const BankType = {
-  BRI: "BRI",
-  BNI: "BNI",
-  MANDIRI: "MANDIRI",
-} as const;
+import { BankName, PaymentMethod, ShippingMethod } from "@prisma/client";
 
 const formSchema = z.object({
   addressId: z.number().min(1, "Pilih alamat pengiriman"),
   shippingMethod: z.nativeEnum(ShippingMethod),
   paymentMethod: z.nativeEnum(PaymentMethod),
-  bank: z.nativeEnum(BankType).optional(),
+  bank: z.nativeEnum(BankName).optional(),
   notes: z.string().optional(),
 });
 
@@ -62,7 +45,7 @@ export default function CheckoutPage() {
       addressId: 0,
       shippingMethod: ShippingMethod.JNE,
       paymentMethod: PaymentMethod.BANK_TRANSFER,
-      bank: BankType.BRI,
+      bank: BankName.BRI,
     },
   });
 
@@ -77,14 +60,6 @@ export default function CheckoutPage() {
       (total, item) => total + item.quantity * item.product.price,
       0,
     ) || 0;
-
-  const shippingCosts = {
-    [ShippingMethod.JNE]: 15000,
-    [ShippingMethod.JNT]: 14000,
-    [ShippingMethod.SICEPAT]: 16000,
-    [ShippingMethod.POS_INDONESIA]: 18000,
-    [ShippingMethod.TIKI]: 17000,
-  };
 
   const shippingCost =
     shippingCosts[
@@ -105,13 +80,13 @@ export default function CheckoutPage() {
 
       const orderData = {
         ...values,
-        name: primaryAddress?.name || "",
-        email: primaryAddress?.email || "",
-        phone: primaryAddress?.phone || "",
-        address: primaryAddress?.address || "",
-        postalCode: primaryAddress?.postalCode || "",
-        city: primaryAddress?.city || "",
-        province: primaryAddress?.province || "",
+        name: primaryAddress?.name ?? "",
+        email: primaryAddress?.email ?? "",
+        phone: primaryAddress?.phone ?? "",
+        address: primaryAddress?.address ?? "",
+        postalCode: primaryAddress?.postalCode ?? "",
+        city: primaryAddress?.city ?? "",
+        province: primaryAddress?.province ?? "",
         total,
         products: carts.map((item) => ({
           productId: item.productId,
@@ -160,8 +135,8 @@ export default function CheckoutPage() {
               <div className="flex gap-4">
                 <div className="h-16 w-16 overflow-hidden rounded border">
                   <Image
-                    src={item.product.images[0]?.imageURL || "/placeholder.svg"}
-                    alt={item.product.name}
+                    src={item.product.images[0]?.imageURL ?? ""}
+                    alt={item.product.name ?? "product name"}
                     width={64}
                     height={64}
                     className="h-full w-full object-cover"

@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { BankName, PaymentMethod, ShippingMethod } from "@prisma/client";
+import { UseFormReturn } from "react-hook-form";
 
 const shippingCosts = {
   JNE: 15000,
@@ -16,7 +18,21 @@ const shippingCosts = {
   TIKI: 17000,
 };
 
-export function ShippingMethodSection({ form }: any) {
+interface Props {
+  form: UseFormReturn<
+    {
+      shippingMethod: ShippingMethod;
+      paymentMethod: PaymentMethod;
+      addressId: number;
+      notes?: string | undefined;
+      bank?: BankName | undefined;
+    },
+    any,
+    undefined
+  >;
+}
+
+export function ShippingMethodSection({ form }: Props) {
   return (
     <div className="rounded-lg p-4 shadow-sm">
       <div className="mb-4 font-medium">Metode Pengiriman</div>
