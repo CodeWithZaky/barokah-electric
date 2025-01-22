@@ -54,8 +54,11 @@ const Sidebar = () => {
     <div className="fixed h-screen w-[20%] border-r">
       <div className="flex items-center space-x-3 border-b p-4">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-          <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+          <AvatarImage
+            src={user?.image ?? ""}
+            alt={user?.name ?? "profile image"}
+          />
+          <AvatarFallback>{user?.name?.charAt(0) ?? "U"}</AvatarFallback>
         </Avatar>
         <div>
           <h3 className="font-medium">{user?.name}</h3>

@@ -91,7 +91,7 @@ export const dashboardRouter = createTRPCRouter({
     const data = Array.from({ length: 12 }, (_, index) => {
       const monthRevenue = monthlyRevenue
         .filter((entry) => new Date(entry.createdAt).getMonth() === index)
-        .reduce((sum, entry) => sum + (entry._sum.total || 0), 0);
+        .reduce((sum, entry) => sum + (entry._sum.total ?? 0), 0);
 
       return {
         name: months[index],

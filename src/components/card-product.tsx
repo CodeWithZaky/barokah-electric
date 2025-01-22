@@ -33,10 +33,8 @@ function CardProduct({ product, addItem }: Props) {
     >
       <div className="relative h-48 w-full overflow-hidden">
         <Image
-          src={
-            product.images[0] ? product.images[0].imageURL : "/placeholder.svg"
-          }
-          alt={product.name}
+          src={product.images[0] ? product.images[0].imageURL : ""}
+          alt={product.name ?? "product name"}
           layout="fill"
           objectFit="cover"
           className="transition-transform hover:scale-105"

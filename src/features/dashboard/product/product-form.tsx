@@ -87,13 +87,13 @@ export default function ProductForm({
   useEffect(() => {
     if (productById) {
       setFormData({
-        name: productById.name || "",
-        description: productById.description || "",
-        price: productById.price || 0,
-        rate: productById.rate || 0,
-        stock: productById.stock || 0,
-        published: productById.published || true,
-        images: productById.images || [],
+        name: productById.name ?? "",
+        description: productById.description ?? "",
+        price: productById.price ?? 0,
+        rate: productById.rate ?? 0,
+        stock: productById.stock ?? 0,
+        published: productById.published ?? true,
+        images: productById.images ?? [],
       });
     }
   }, [productById]);

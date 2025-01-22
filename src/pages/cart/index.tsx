@@ -1,5 +1,3 @@
-"use client";
-
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import {
@@ -142,10 +140,8 @@ export default function Cart() {
                     />
                     <div className="h-16 w-16 overflow-hidden rounded border">
                       <Image
-                        src={
-                          item.product.images[0]?.imageURL || "/placeholder.svg"
-                        }
-                        alt={item.product.name}
+                        src={item.product.images[0]?.imageURL ?? ""}
+                        alt={item.product.name ?? "product name"}
                         width={64}
                         height={64}
                         className="h-full w-full object-cover"

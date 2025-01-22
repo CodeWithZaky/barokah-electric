@@ -29,9 +29,9 @@ export default function UpdateProfileModal({
   userData,
 }: UpdateProfileModalProps) {
   const [formData, setFormData] = useState({
-    name: userData.name || "",
-    email: userData.email || "",
-    image: userData.image || "",
+    name: userData.name ?? "",
+    email: userData.email ?? "",
+    image: userData.image ?? "",
   });
 
   const { toast } = useToast();
@@ -71,9 +71,9 @@ export default function UpdateProfileModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex flex-col items-center space-y-4">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={formData?.image || ""} alt={formData.name} />
-              <AvatarFallback>{formData?.name.charAt(0)}</AvatarFallback>
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={formData?.image ?? ""} alt={formData.name} />
+              <AvatarFallback>{formData?.name.charAt(0) ?? "U"}</AvatarFallback>
             </Avatar>
             <UploadButton
               endpoint="imageUploader"

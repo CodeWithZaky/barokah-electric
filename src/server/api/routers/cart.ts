@@ -19,7 +19,7 @@ export const cartRouter = createTRPCRouter({
         },
       },
     });
-    return cart || { items: [] }; // Return empty cart if not found
+    return cart ?? { items: [] }; // Return empty cart if not found
   }),
 
   // Add an item to the cart
@@ -151,7 +151,7 @@ export const cartRouter = createTRPCRouter({
       where: { userId },
       include: { items: true },
     });
-    return cart?.items.length || 0;
+    return cart?.items.length ?? 0;
   }),
 
   // update checked cart item
@@ -209,6 +209,6 @@ export const cartRouter = createTRPCRouter({
         },
       },
     });
-    return cart || { items: [] }; // Return empty cart if not found
+    return cart ?? { items: [] }; // Return empty cart if not found
   }),
 });
