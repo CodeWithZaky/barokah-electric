@@ -1,9 +1,9 @@
-This is an e-commerce platform rewrite from java9cell fe and be repos, built using t3stack
+This is an e-commerce platform, built using t3stack
 
 ### Technologies
 
 - **Frontend**: Next.js, Tailwind CSS, Radix UI
-- **Backend**: Prisma, tRPC, NextAuth.js
+- **Backend**: Prisma, tRPC, NextAuth.js, PostgreSQL
 - **Utilities**: TypeScript, ESLint, Prettier
 
 ### Package Manager
